@@ -1,5 +1,5 @@
 <template>
-  <div ref="grid-layout" :style="mergeStyles" class="vue3-grid-layout">
+  <div ref="layoutRef" :style="mergeStyles" class="vue3-grid-layout">
     <slot></slot>
     <grid-item
         class="vue3-grid-placeholder"
@@ -14,22 +14,18 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  CSSProperties,
-  getCurrentInstance,
-  nextTick,
-  onBeforeMount,
-  onBeforeUnmount,
-  onMounted,
-  provide,
-  ref,
-  watch
-} from "vue";
+import {CSSProperties, nextTick, onBeforeMount, onBeforeUnmount, onMounted, provide, ref, watch,} from "vue";
 import GridItem from "./GridItem.vue";
 import elementResizeDetectorMaker from "element-resize-detector"
-import {Breakpoint, IGridItem, IGridLayout} from "../types";
-import {addWindowEventListener, removeWindowEventListener} from "../utils/dom.ts";
-import {emitter} from "../utils";
+import {IGridItem, IGridLayout, Layout} from "../types";
+import {
+  addWindowEventListener,
+  emitter,
+  findOrGenerateResponsiveLayout,
+  getBreakpointFromWidth,
+  getColsFromBreakpoint,
+  removeWindowEventListener
+} from "../utils";
 import {
   bottom,
   cloneLayout,
@@ -39,11 +35,6 @@ import {
   moveElement,
   validateLayout
 } from '../utils/utils.ts';
-import {
-  findOrGenerateResponsiveLayout,
-  getBreakpointFromWidth,
-  getColsFromBreakpoint
-} from "../utils/responsiveUtils.ts";
 
 const props = withDefaults(defineProps<IGridLayout>(), {
   autoSize: true,
@@ -66,8 +57,14 @@ const props = withDefaults(defineProps<IGridLayout>(), {
   preventCollision: false,
   useStyleCursor: true
 })
-const emit = defineEmits(['layout-created', 'layout-before-mount', 'layout-mounted',
-  'layout-ready', 'layout-updated', 'breakpoint-changed'])
+const emit = defineEmits<{
+  'layout-created': [layout: Layout]
+  'layout-before-mount': [layout: Layout]
+  'layout-mounted': [layout: Layout]
+  'layout-ready': [layout: Layout]
+  'layout-updated': [layout: Layout]
+  'breakpoint-changed': [breakpoint: string, layout: Layout]
+}>()
 
 let width = ref<number>()
 let mergeStyles = ref<CSSProperties>({})
@@ -76,17 +73,26 @@ let placeholder = ref<IGridItem>({
   y: 0,
   w: 0,
   h: 0,
-  i: -1
+  i: ''
 })
 let isDragging = ref(false)
 let lastLayoutLength = ref(0)
 let layoutRef = ref<HTMLElement | null>(null)
-let lastBreakpoint = ref<Breakpoint | null>(null)
+let lastBreakpoint = ref<string | null>(null)
 let layouts = ref()
 let originalLayout = ref(null)
-let layout = ref({})
 let erd = ref<any>(null)
-const resizeEvent = (eventName, id, x, y, h, w) => {
+
+provide('layout', {...props, lastBreakpoint: lastBreakpoint.value})
+const resizeEventHandler = (obj?: {
+  eventName: string,
+  id: string,
+  x: number,
+  y: number,
+  h: number,
+  w: number
+}) => {
+  const {eventName, id, x, y, h, w} = obj || {}
   let l = getLayoutItem(props.layout, id);
   //GetLayoutItem sometimes return null object
   if (l === undefined || l === null) {
@@ -147,7 +153,7 @@ const resizeEvent = (eventName, id, x, y, h, w) => {
 
   if (eventName === 'resizeend') emit('layout-updated', props.layout);
 }
-const findDifference = (layout, originalLayout) => {
+const findDifference = (layout: Layout, originalLayout: Layout) => {
   //Find values that are in result1 but not in result2
   let uniqueResultOne = layout.filter(function (obj) {
     return !originalLayout.some(function (obj2) {
@@ -165,18 +171,23 @@ const findDifference = (layout, originalLayout) => {
   //Combine the two arrays of unique entries#
   return uniqueResultOne.concat(uniqueResultTwo);
 }
-const resizeEventHandler = (eventType, i, x, y, h, w) => {
-  resizeEvent(eventType, i, x, y, h, w);
-}
+
 let positionsBeforeDrag = ref()
-const dragEvent = (eventName, id, x, y, h, w) => {
-  let l = getLayoutItem(layout.value, id);
+const dragEventHandler = ({eventName, id, x, y, h, w}: {
+  eventName: string,
+  id: string,
+  x: number,
+  y: number,
+  h: number,
+  w: number
+}) => {
+  let l = getLayoutItem(props.layout, id);
   //GetLayoutItem sometimes returns null object
   if (l === undefined || l === null) {
     l = {x: 0, y: 0}
   }
-  if (eventName === "dragstart" && !this.verticalCompact) {
-    positionsBeforeDrag.value = layout.value.reduce((result, {i, x, y}) => ({
+  if (eventName === "dragstart" && !props.verticalCompact) {
+    positionsBeforeDrag.value = props.layout.reduce((result, {i, x, y}) => ({
       ...result,
       [i]: {x, y}
     }), {});
@@ -197,16 +208,16 @@ const dragEvent = (eventName, id, x, y, h, w) => {
       isDragging.value = true;
     });
   }
-  layout.value = moveElement(layout.value, l, x, y, true, props.preventCollision);
+  props.layout = moveElement(props.layout, l, x, y, true, props.preventCollision);
 
   if (props.restoreOnDrag) {
     // Do not compact items more than in layout before drag
     // Set moved item as static to avoid to compact it
     l.static = true;
-    compact(layout.value, props.verticalCompact, positionsBeforeDrag.value);
+    compact(props.layout, props.verticalCompact, positionsBeforeDrag.value);
     l.static = false;
   } else {
-    compact(layout.value, props.verticalCompact);
+    compact(props.layout, props.verticalCompact);
   }
 
   // needed because vue can't detect changes on array element properties
@@ -214,18 +225,14 @@ const dragEvent = (eventName, id, x, y, h, w) => {
   updateHeight();
   if (eventName === 'dragend') {
     positionsBeforeDrag.value = null;
-    emit('layout-updated', layout.value);
+    emit('layout-updated', props.layout);
   }
 }
-
-const dragEventHandler = (eventType, i, x, y, h, w) => {
-  dragEvent(eventType, i, x, y, h, w);
-};
 
 emitter.on('resizeEvent', resizeEventHandler);
 emitter.on('dragEvent', dragEventHandler);
 
-emit('layout-created', layout.value);
+emit('layout-created', props.layout);
 
 const onWindowResize = () => {
   if (layoutRef.value) {
@@ -245,7 +252,7 @@ onBeforeUnmount(() => {
 
 
 onBeforeMount(() => {
-  emit('layout-before-mount', layout.value)
+  emit('layout-before-mount', props.layout)
 })
 
 const initResponsiveFeatures = () => {
@@ -256,7 +263,7 @@ const containerHeight = () => {
   if (!props.autoSize) {
     return
   }
-  return `${bottom(layout.value) * (props.rowHeight + props.margin[1]) + props.margin[1]}px`;
+  return `${bottom(props.layout) * (props.rowHeight + props.margin[1]) + props.margin[1]}px`;
 }
 
 function updateHeight() {
@@ -266,15 +273,15 @@ function updateHeight() {
 }
 
 onMounted(() => {
-  emit('layout-mounted', layout.value)
-  validateLayout(layout.value)
-  originalLayout.value = layout.value
+  emit('layout-mounted', props.layout)
+  validateLayout(props.layout)
+  originalLayout.value = props.layout
   nextTick(() => {
     initResponsiveFeatures()
     onWindowResize()
     addWindowEventListener('resize', onWindowResize);
-    compact(layout.value, props.verticalCompact);
-    emit('layout-updated', layout.value)
+    compact(props.layout, props.verticalCompact);
+    emit('layout-updated', props.layout)
     updateHeight();
     nextTick(() => {
       erd.value = elementResizeDetectorMaker({
@@ -294,7 +301,7 @@ watch(width, (newVal, oldVal) => {
     emitter.emit('updateWidth', width)
     if (oldVal == null) {
       nextTick(() => {
-        emit('layout-ready', layout)
+        emit('layout-ready', props.layout)
       })
     }
     updateHeight()
@@ -306,7 +313,7 @@ const responsiveGridLayout = () => {
 
   // save actual layout in layouts
   if (lastBreakpoint.value != null && !layouts.value[lastBreakpoint.value])
-    ayouts.value[lastBreakpoint.value] = cloneLayout(props.layout);
+    layouts.value[lastBreakpoint.value] = cloneLayout(props.layout);
 
   // Find or generate a new layout.
   let layout = findOrGenerateResponsiveLayout(
@@ -314,7 +321,6 @@ const responsiveGridLayout = () => {
       layouts.value,
       props.breakpoints,
       newBreakpoint,
-      lastBreakpoint.value,
       newCols,
       props.verticalCompact
   );
@@ -327,18 +333,18 @@ const responsiveGridLayout = () => {
   }
 
   // new prop sync
-  emit('update:layout', layout);
+  emit('layout-updated', layout);
 
   lastBreakpoint.value = newBreakpoint;
   emitter.emit("setColNum", getColsFromBreakpoint(newBreakpoint, props.cols));
 }
 
 const layoutUpdate = () => {
-  if (layout.value !== undefined && originalLayout.value !== null) {
-    if (layout.value.length !== originalLayout.value.length) {
-      let diff = findDifference(layout.value, originalLayout.value)
+  if (props.layout !== undefined && originalLayout.value !== null) {
+    if (props.layout.length !== originalLayout.value.length) {
+      let diff = findDifference(props.layout, originalLayout.value)
       if (diff.length > 0) {
-        if (layout.value.length > originalLayout.value.length) {
+        if (props.layout.length > originalLayout.value.length) {
           originalLayout.value = originalLayout.value.concat(diff)
         } else {
           originalLayout.value = originalLayout.value.filter(obj => {
@@ -346,18 +352,18 @@ const layoutUpdate = () => {
           })
         }
       }
-      lastLayoutLength.value = layout.value.length
+      lastLayoutLength.value = props.layout.length
       initResponsiveFeatures()
     }
-    compact(layout.value, props.verticalCompact)
+    compact(props.layout, props.verticalCompact)
     emitter.emit('updateWidth', width.value)
     updateHeight()
-    emit('layout-updated', layout.value)
+    emit('layout-updated', props.layout)
   }
 
 }
 
-watch(layout, () => {
+watch(() => props.layout, () => {
   layoutUpdate()
 })
 
@@ -381,7 +387,7 @@ watch(() => props.transformScale, () => {
 })
 watch(() => props.responsive, () => {
   if (!props.responsive) {
-    emit('update:layout', originalLayout.value)
+    emit('layout-updated', originalLayout.value)
     emitter.emit('setColNum', props.colNum)
   }
   onWindowResize()
@@ -391,6 +397,7 @@ watch(() => props.maxRows, () => {
 })
 watch(() => props.margin, () => {
   updateHeight()
+  emitter.emit('setMargin', props.margin)
 })
 
 
@@ -398,14 +405,7 @@ defineExpose({
   layoutRef
 })
 
-provide('layout', getCurrentInstance())
-
 
 </script>
 
-<style scoped>
-.vue3-grid-layout {
-  position: relative;
-  transition: height 200ms ease;
-}
-</style>
+

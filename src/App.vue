@@ -1,85 +1,123 @@
 <template>
-  <div>
-    <grid-layout
-        :col-num="12"
-        :is-draggable="true"
-        :is-mirrored="false"
-        :is-resizable="true"
-        :layout="layout"
-        :margin="[10, 10]"
-        :row-height="30"
-        :use-css-transforms="true"
-        :vertical-compact="true"
-        @layout-created="layoutCreatedEvent"
-        @layout-before-mount="layoutBeforeMountEvent"
-        @layout-mounted="layoutMountedEvent"
-        @layout-ready="layoutReadyEvent"
-        @layout-updated="layoutUpdatedEvent"
-        @breakpoint-changed="breakpointChangedEvent"
+  <div id="app">
+    <h1 style="text-align: center">Vue Grid Layout</h1>
+    <grid-layout v-model:layout="layout"
+                 :col-num="12"
+                 :row-height="30"
+                 :is-draggable="draggable"
+                 :is-resizable="resizable"
+                 :vertical-compact="true"
+                 :use-css-transforms="true"
     >
-
       <grid-item v-for="item in layout"
-                 :key="item.i"
+                 :static="item.static"
+                 :x="item.x"
+                 :y="item.y"
+                 :w="item.w"
                  :h="item.h"
                  :i="item.i"
-                 :w="item.w"
-                 :x="item.x"
-                 :y="item.y" col-num="5">
-        {{ item.i }}
+      >
+        <span class="text">{{ itemTitle(item) }}</span>
       </grid-item>
     </grid-layout>
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
+import GridLayout from './components/GridLayout.vue'
+import GridItem from './components/GridItem.vue'
+import {ref} from "vue";
 
-import GridLayout from "./components/GridLayout.vue";
-import GridItem from "./components/GridItem.vue";
+const layout = ref([
+  {"x": 0, "y": 0, "w": 2, "h": 2, "i": "0", static: false},
+  {"x": 2, "y": 0, "w": 2, "h": 4, "i": "1", static: true},
+  {"x": 4, "y": 0, "w": 2, "h": 5, "i": "2", static: false},
+  {"x": 6, "y": 0, "w": 2, "h": 3, "i": "3", static: false},
+  {"x": 8, "y": 0, "w": 2, "h": 3, "i": "4", static: false},
+  {"x": 10, "y": 0, "w": 2, "h": 3, "i": "5", static: false},
+  {"x": 0, "y": 5, "w": 2, "h": 5, "i": "6", static: false},
+  {"x": 2, "y": 5, "w": 2, "h": 5, "i": "7", static: false},
+  {"x": 4, "y": 5, "w": 2, "h": 5, "i": "8", static: false},
+  {"x": 6, "y": 3, "w": 2, "h": 4, "i": "9", static: true},
+  {"x": 8, "y": 4, "w": 2, "h": 4, "i": "10", static: false},
+  {"x": 10, "y": 4, "w": 2, "h": 4, "i": "11", static: false},
+  {"x": 0, "y": 10, "w": 2, "h": 5, "i": "12", static: false},
+  {"x": 2, "y": 10, "w": 2, "h": 5, "i": "13", static: false},
+  {"x": 4, "y": 8, "w": 2, "h": 4, "i": "14", static: false},
+  {"x": 6, "y": 8, "w": 2, "h": 4, "i": "15", static: false},
+  {"x": 8, "y": 10, "w": 2, "h": 5, "i": "16", static: false},
+  {"x": 10, "y": 4, "w": 2, "h": 2, "i": "17", static: false},
+  {"x": 0, "y": 9, "w": 2, "h": 3, "i": "18", static: false},
+  {"x": 2, "y": 6, "w": 2, "h": 2, "i": "19", static: false}
+])
+const draggable = ref(true)
+const resizable = ref(true)
 
-const layoutCreatedEvent = () => {
-  console.log('layoutCreatedEvent')
+const itemTitle = (item: any) => {
+  let result = item.i;
+  if (item.static) {
+    result += " - Static";
+  }
+  return result;
 }
-const layoutBeforeMountEvent = () => {
-  console.log('layoutBeforeMountEvent')
-}
-const layoutMountedEvent = () => {
-  console.log('layoutMountedEvent')
-}
-const layoutReadyEvent = () => {
-  console.log('layoutReadyEvent')
-}
-const layoutUpdatedEvent = () => {
-  console.log('layoutUpdatedEvent')
-}
-const breakpointChangedEvent = () => {
-  console.log('breakpointChangedEvent')
-}
-
-const layout = [
-  {"x": 0, "y": 0, "w": 2, "h": 2, "i": "0"},
-  {"x": 2, "y": 0, "w": 2, "h": 4, "i": "1"},
-  {"x": 4, "y": 0, "w": 2, "h": 5, "i": "2"},
-  {"x": 6, "y": 0, "w": 2, "h": 3, "i": "3"},
-  {"x": 8, "y": 0, "w": 2, "h": 3, "i": "4"},
-  {"x": 10, "y": 0, "w": 2, "h": 3, "i": "5"},
-  {"x": 0, "y": 5, "w": 2, "h": 5, "i": "6"},
-  {"x": 2, "y": 5, "w": 2, "h": 5, "i": "7"},
-  {"x": 4, "y": 5, "w": 2, "h": 5, "i": "8"},
-  {"x": 6, "y": 3, "w": 2, "h": 4, "i": "9"},
-  {"x": 8, "y": 4, "w": 2, "h": 4, "i": "10"},
-  {"x": 10, "y": 4, "w": 2, "h": 4, "i": "11"},
-  {"x": 0, "y": 10, "w": 2, "h": 5, "i": "12"},
-  {"x": 2, "y": 10, "w": 2, "h": 5, "i": "13"},
-  {"x": 4, "y": 8, "w": 2, "h": 4, "i": "14"},
-  {"x": 6, "y": 8, "w": 2, "h": 4, "i": "15"},
-  {"x": 8, "y": 10, "w": 2, "h": 5, "i": "16"},
-  {"x": 10, "y": 4, "w": 2, "h": 2, "i": "17"},
-  {"x": 0, "y": 9, "w": 2, "h": 3, "i": "18"},
-  {"x": 2, "y": 6, "w": 2, "h": 2, "i": "19"}
-]
-
 </script>
 
 <style scoped>
+.vue3-grid-layout {
+  background: #eee;
+}
+
+.vue3-grid-item:not(.vue-grid-placeholder) {
+  background: #ccc;
+  border: 1px solid black;
+}
+
+.vue3-grid-item .resizing {
+  opacity: 0.9;
+}
+
+.vue3-grid-item .static {
+  background: #cce;
+}
+
+.vue3-grid-item .text {
+  font-size: 24px;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.vue3-grid-item .no-drag {
+  height: 100%;
+  width: 100%;
+}
+
+.vue3-grid-item .minMax {
+  font-size: 12px;
+}
+
+.vue3-grid-item .add {
+  cursor: pointer;
+}
+
+.vue3-draggable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 0;
+  left: 0;
+  padding: 0 8px 8px 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat bottom right;
+  background-origin: content-box;
+  box-sizing: border-box;
+  cursor: pointer;
+}
 
 </style>
+

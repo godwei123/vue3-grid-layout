@@ -146,10 +146,15 @@
   dependencies:
     eslint-visitor-keys "^3.3.0"
 
-"@interactjs/types@1.10.17", "@interactjs/types@^1.10.17":
-  version "1.10.17"
-  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.17.tgz#1649de06d9ead790c81ecece76736b852bdfc77e"
-  integrity sha512-X2JpoM7xUw0p9Me0tMaI0HNfcF/Hd07ZZlzpnpEMpGerUZOLoyeThrV9P+CrBHxZrluWJrigJbcdqXliFd0YMA==
+"@interactjs/core@^1.10.18":
+  version "1.10.18"
+  resolved "https://registry.yarnpkg.com/@interactjs/core/-/core-1.10.18.tgz#02e3c8ac67455d33b06973a7423233ca4585e5d1"
+  integrity sha512-shXHL+U5BMLtWMY84Bpo7OCMEueQdj0NgDGZDPzXMrmxriz1Ovn8fw2VmI18xFWryTbKJc2RwRDK/NJ6Vg+tNg==
+
+"@interactjs/types@1.10.18", "@interactjs/types@^1.10.18":
+  version "1.10.18"
+  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.18.tgz#807411b3e460f856e26e7ba988dab6abb14da15f"
+  integrity sha512-3a+2Kx6PhA60ekxImRQJl+EyT4lD0/kd3/PveyaLtgfNxkxnSWdUq7Ixo3Y/t1lon4EqVGZQgp+qj/QNaEs6qA==
 
 "@jridgewell/sourcemap-codec@^1.4.15":
   version "1.4.15"
@@ -871,12 +876,12 @@ inquirer@^7.0.0:
     strip-ansi "^6.0.0"
     through "^2.3.6"
 
-interactjs@^1.10.17:
-  version "1.10.17"
-  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.10.17.tgz#aed66a63020cd092236133f9149e6448dc405d72"
-  integrity sha512-grjHJgnWkCoQLmAlk2yalNd1r0ztUhXLJNVjSOfWn1wfNNgU2tx1cDEkro9WYerDNC9UG3MZTeD4O6zOM5gbIA==
+interactjs@^1.10.18:
+  version "1.10.18"
+  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.10.18.tgz#6e5db48389f22d3b0499124bc84ebdeaa5107fb6"
+  integrity sha512-ho+Qgr5U3b3oz23Iv7MkIZGoWaTsSCRnrCL34Dtjzs5eFghwpESJeiPj9RhYKc/SgRJL9anR+2OQxFsCg4PmLA==
   dependencies:
-    "@interactjs/types" "1.10.17"
+    "@interactjs/types" "1.10.18"
 
 is-extglob@^2.1.1:
   version "2.1.1"

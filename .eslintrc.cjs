@@ -1,6 +1,7 @@
 module.exports = {
-  'extends': [
-    'plugin:vue/essential',
-    'eslint:recommended'
-  ],
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  }
 }

@@ -1,7 +1,7 @@
 {
-  "name": "vue3-grid-layout",
+  "name": "@godwei/vue3-grid-layout",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1-beta",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",

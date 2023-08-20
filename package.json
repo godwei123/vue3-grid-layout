@@ -8,8 +8,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@interactjs/actions": "^1.10.18",
+    "@interactjs/auto-scroll": "^1.10.18",
+    "@interactjs/auto-start": "^1.10.18",
+    "@interactjs/dev-tools": "^1.10.18",
+    "@interactjs/interact": "^1.10.18",
+    "@interactjs/interactjs": "^1.10.18",
+    "@interactjs/modifiers": "^1.10.18",
     "element-resize-detector": "^1.2.4",
-    "interactjs": "^1.10.18",
     "mitt": "^3.0.1",
     "vue": "^3.3.4"
   },

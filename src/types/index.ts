@@ -47,7 +47,7 @@ export type LayoutItemRequired = {
     h: number,
     x: number,
     y: number,
-    i: string
+    i: string | number | symbol
 };
 export type Layout = Array<IGridItem>;
 export type IObject = Record<string, any>
@@ -59,13 +59,16 @@ export type Breakpoint = keyof Breakpoints;
 export type Cols = PartialRecordSize
 
 
-export type ItemPropsType = IGridItem & { margin?: [number, number] }
+export type ItemPropsType = IGridItem & {
+    margin?: [number, number]
+}
 
 export type Position = {
-    left: number,
+    left?: number,
     top: number,
     width: number,
     height: number
+    right?: number;
 };
 
 export type EleSize = {
@@ -79,9 +82,9 @@ export interface IGridItem extends LayoutItemRequired {
     minH?: number,
     maxW?: number,
     maxH?: number,
-    isDraggable?: boolean,
-    isResizable?: boolean,
-    isBounded?: boolean,
+    isDraggable?: boolean | null,
+    isResizable?: boolean | null,
+    isBounded?: boolean | null,
     static?: boolean,
     dragIgnoreFrom?: string,
     dragAllowFrom?: string,
@@ -105,7 +108,7 @@ export interface IGridLayout {
     isMirrored?: boolean,
     isBounded?: boolean,
     autoSize?: boolean,
-    restoreOnDrag: boolean
+    restoreOnDrag?: boolean
     verticalCompact?: boolean,
     preventCollision?: boolean,
     useCssTransforms?: boolean,
@@ -113,6 +116,7 @@ export interface IGridLayout {
     breakpoints?: Breakpoints,
     useStyleCursor?: boolean,
     cols?: Cols,
+    transformScale?: number
 }
 
 
@@ -128,22 +132,68 @@ export type Events = {
     directionChange?: any,
     setTransformScale?: any
     setResizeable?: boolean
-    resizeEvent: ({
+    resizeEvent: ([
         eventName: string,
-        id: string,
+        id: string | number | symbol,
         x: number,
         y: number,
         h: number,
         w: number
-    }) | undefined
-    dragEvent: {
+    ]) | undefined
+    dragEvent: [
         eventName: string,
-        id: string,
+        id: string | number | symbol,
         x: number,
         y: number,
         h: number,
         w: number
-    },
-    setMargin: [number, number]
+    ],
 };
+
+export interface LayoutState {
+    width?: number | null,
+    mergeStyles?: CSSProperties,
+    lastLayoutLength?: number,
+    isDragging?: boolean,
+    placeholder?: IGridItem,
+    layouts?: IObject,
+    lastBreakpoint?: null | Breakpoint,
+    originalLayout?: null | Layout,
+}
+
+export interface ItemState {
+    cols: number,
+    containerWidth: number,
+    rowHeight: number,
+    margin: [number, number],
+    maxRows: number,
+    draggable: null | boolean,
+    resizable: null | boolean,
+    bounded: null | boolean,
+    transformScale: number,
+    useCssTransforms: boolean,
+    useStyleCursor: boolean,
+    isDragging: boolean,
+    isResizing: boolean,
+    dragging: null | IObject,
+    resizing: null | IObject,
+    lastX: number,
+    lastY: number,
+    lastW: number,
+    lastH: number,
+    style: CSSProperties,
+    rtl: boolean,
+
+    dragEventSet: boolean,
+    resizeEventSet: boolean,
+
+    previousW: null | number,
+    previousH: null | number,
+    previousX: null | number,
+    previousY: null | number,
+    innerX: number,
+    innerY: number,
+    innerW: number,
+    innerH: number,
+}
 

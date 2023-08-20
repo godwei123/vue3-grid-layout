@@ -550,12 +550,7 @@ export function moveElement(layout, l, x, y, isUserAction, preventCollision) {
  */
 // export function moveElementAwayFromCollision(layout: Layout, collidesWith: LayoutItem,
 //                                              itemToMove: LayoutItem, isUserAction: ?boolean): Layout {
-export function moveElementAwayFromCollision(
-  layout,
-  collidesWith,
-  itemToMove,
-  isUserAction,
-) {
+export function moveElementAwayFromCollision(layout, collidesWith, itemToMove, isUserAction) {
   const preventCollision = false; // we're already colliding
   // If there is enough space above the collision to put this element, move it there.
   // We only do this on the main collision as this can get funky in cascades and cause

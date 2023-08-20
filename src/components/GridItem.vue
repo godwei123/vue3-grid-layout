@@ -13,24 +13,19 @@
 <script setup lang="ts">
 import {IGridLayout, ItemPropsType, ItemState, LayoutState, Position} from "../types";
 import {computed, CSSProperties, inject, onBeforeUnmount, onMounted, reactive, ref, unref, watch} from "vue";
-// import {
-//   calcGridItemWHPx,
-//   clamp,
-//   createCoreData,
-//   emitter,
-//   getColsFromBreakpoint,
-//   getControlPosition,
-//   getDocumentDir,
-//   setTopLeft,
-//   setTopRight,
-//   setTransform,
-//   setTransformRtl
-// } from "../utils/helpers.js";
-import {setTopLeft, setTopRight, setTransform, setTransformRtl,} from '../utils/utils';
-import {createCoreData, getControlPosition,} from '../utils/draggableUtils';
-import {getColsFromBreakpoint,} from '../utils/responsiveUtils';
-import {getDocumentDir,} from '../utils/DOM';
-import {calcGridItemWHPx, clamp, emitter} from "../utils/helpers.js";
+import {
+  calcGridItemWHPx,
+  clamp,
+  createCoreData,
+  emitter,
+  getColsFromBreakpoint,
+  getControlPosition,
+  getDocumentDir,
+  setTopLeft,
+  setTopRight,
+  setTransform,
+  setTransformRtl
+} from "../utils/helpers.js";
 import interact from '@interactjs/interact';
 import '@interactjs/auto-start';
 import '@interactjs/auto-scroll';
@@ -618,6 +613,7 @@ onBeforeUnmount(() => {
 .vue3-grid-item {
   transition: all 200ms ease;
   transition-property: left, top, right;
+  box-sizing: border-box;
 }
 
 .vue3-grid-item.no-touch {

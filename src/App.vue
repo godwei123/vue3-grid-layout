@@ -2,10 +2,7 @@
 import {onMounted, reactive,} from 'vue';
 import GridItem from './components/GridItem.vue';
 import GridLayout from './components/GridLayout.vue';
-// import ResponsiveGridLayout from './components/ResponsiveGridLayout.vue';
-// import CustomDragElement from './components/CustomDragElement.vue';
 import {getDocumentDir, setDocumentDir} from './utils/DOM';
-// var eventBus = require('./eventBus');
 
 const testLayout = [
   {x: 0, y: 0, w: 2, h: 2, i: '0', resizable: true, draggable: true, static: false, minY: 0, maxY: 2},
@@ -74,10 +71,6 @@ const state = reactive({
 onMounted(() => {
   state.index = state.layout.length;
 });
-
-// function clicked()  {
-//   window.alert("CLICK!");
-// }
 
 function increaseWidth() {
   let width = document.getElementById('content').offsetWidth;

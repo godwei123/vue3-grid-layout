@@ -18,34 +18,34 @@ import {nextTick, onBeforeMount, onBeforeUnmount, onMounted, provide, reactive, 
 import GridItem from "./GridItem.vue";
 import elementResizeDetectorMaker, {Erd} from "element-resize-detector"
 import {IGridLayout, Layout, LayoutState} from "../types";
-// import {
-//   addWindowEventListener,
-//   bottom,
-//   cloneLayout,
-//   compact,
-//   emitter,
-//   findDifference,
-//   findOrGenerateResponsiveLayout,
-//   getAllCollisions,
-//   getBreakpointFromWidth,
-//   getColsFromBreakpoint,
-//   getLayoutItem,
-//   moveElement,
-//   removeWindowEventListener,
-//   validateLayout
-// } from "../utils/helpers.js";
 import {
+  addWindowEventListener,
   bottom,
   cloneLayout,
   compact,
+  emitter,
+  findDifference,
+  findOrGenerateResponsiveLayout,
   getAllCollisions,
+  getBreakpointFromWidth,
+  getColsFromBreakpoint,
   getLayoutItem,
   moveElement,
-  validateLayout,
-} from '../utils/utils';
-import {findOrGenerateResponsiveLayout, getBreakpointFromWidth, getColsFromBreakpoint,} from '../utils/responsiveUtils';
-import {addWindowEventListener, removeWindowEventListener,} from '../utils/DOM';
-import {emitter, findDifference} from "../utils/helpers.js";
+  removeWindowEventListener,
+  validateLayout
+} from "../utils/helpers";
+// import {
+//   bottom,
+//   cloneLayout,
+//   compact,
+//   getAllCollisions,
+//   getLayoutItem,
+//   moveElement,
+//   validateLayout,
+// } from '../utils/utils';
+// import {findOrGenerateResponsiveLayout, getBreakpointFromWidth, getColsFromBreakpoint,} from '../utils/responsiveUtils';
+// import {addWindowEventListener, removeWindowEventListener,} from '../utils/DOM';
+// import {emitter, findDifference} from "../utils/helpers.js";
 
 const props = withDefaults(defineProps<IGridLayout>(), {
   autoSize: true,

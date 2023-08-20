@@ -225,14 +225,7 @@ export function findOrGenerateResponsiveLayout(
 // export function generateResponsiveLayout(layout: Layout, breakpoints: Breakpoints,
 //                                                breakpoint: Breakpoint, lastBreakpoint: Breakpoint,
 //                                                cols: number, verticalCompact: boolean): Layout {
-export function generateResponsiveLayout(
-  layout,
-  breakpoints,
-  breakpoint,
-  lastBreakpoint,
-  cols,
-  verticalCompact,
-) {
+export function generateResponsiveLayout(layout, breakpoints, breakpoint, lastBreakpoint, cols, verticalCompact) {
   // If it already exists, just return it.
   /* if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
   // Find or generate the next layout

@@ -202,7 +202,7 @@ export function findOrGenerateResponsiveLayout(
   breakpoint,
   lastBreakpoint,
   cols,
-  verticalCompact,
+  verticalCompact
 ) {
   // If it already exists, just return it.
   if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);

@@ -1,6 +1,6 @@
 // @flow
 
-import { cloneLayout, compact, correctBounds } from './utils';
+import {cloneLayout, compact, correctBounds} from './utils';
 
 // import type {Layout} from './utils';
 // export type ResponsiveLayout = {lg?: Layout, md?: Layout, sm?: Layout, xs?: Layout, xxs?: Layout};
@@ -65,7 +65,7 @@ export function findOrGenerateResponsiveLayout(
   breakpoint,
   lastBreakpoint,
   cols,
-  verticalCompact,
+  verticalCompact
 ) {
   // If it already exists, just return it.
   if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
@@ -82,7 +82,7 @@ export function findOrGenerateResponsiveLayout(
     }
   }
   layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
-  return compact(correctBounds(layout, { cols }), verticalCompact);
+  return compact(correctBounds(layout, {cols}), verticalCompact);
 }
 
 // export function generateResponsiveLayout(layout: Layout, breakpoints: Breakpoints,
@@ -110,7 +110,7 @@ export function generateResponsiveLayout(
     }
   } */
   layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
-  return compact(correctBounds(layout, { cols }), verticalCompact);
+  return compact(correctBounds(layout, {cols}), verticalCompact);
 }
 
 /**

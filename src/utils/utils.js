@@ -293,7 +293,7 @@ export function moveElementAwayFromCollision(
   layout,
   collidesWith,
   itemToMove,
-  isUserAction,
+  isUserAction
 ) {
   const preventCollision = false; // we're already colliding
   // If there is enough space above the collision to put this element, move it there.
@@ -346,6 +346,7 @@ export function setTransform(top, left, width, height) {
     position: 'absolute',
   };
 }
+
 /**
  * Just like the setTransform method, but instead it will return a negative value of right.
  *
@@ -381,6 +382,7 @@ export function setTopLeft(top, left, width, height) {
     position: 'absolute',
   };
 }
+
 /**
  * Just like the setTopLeft method, but instead, it will return a right property instead of left.
  *
@@ -432,6 +434,7 @@ export function sortLayoutItemsByRowCol(layout) {
  * @param  {Boolean} verticalCompact Whether or not to compact the layout vertically.
  * @return {Array}                Working layout.
  */
+
 /*
 export function synchronizeLayoutWithChildren(initialLayout: Layout, children: Array<React.Element>|React.Element,
                                               cols: number, verticalCompact: boolean): Layout {
@@ -530,7 +533,6 @@ export function autoBindHandlers(el, fns) {
 }
 
 
-
 /**
  * Convert a JS object to CSS string. Similar to React's output of CSS.
  * @param obj
@@ -539,7 +541,8 @@ export function autoBindHandlers(el, fns) {
 export function createMarkup(obj) {
   const keys = Object.keys(obj);
   if (!keys.length) return '';
-  let i; const
+  let i;
+  const
     len = keys.length;
   let result = '';
 

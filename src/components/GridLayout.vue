@@ -193,7 +193,8 @@ watch(() => props.responsive, () => {
 watch(() => props.maxRows, () => emitter.emit('setMaxRows', props.maxRows))
 watch(() => props.margin, () => updateHeight())
 
-const resizeEventHandler = (params: [string, string | number, number, number, number, number]) => {
+const resizeEventHandler = (params: [string, string, number, number, number, number] | undefined) => {
+  if (params === undefined) return
   const [eventName, id, x, y, h, w] = params
   let l: any;
   l = getLayoutItem(props.layout, id)

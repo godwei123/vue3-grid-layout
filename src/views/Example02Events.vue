@@ -6,7 +6,7 @@
       </div>
     </div>
     <div style="margin-top:10px;">
-      <grid-layout :layout.sync="layout"
+      <grid-layout v-model:layout="layout"
                    :col-num="12"
                    :row-height="30"
                    :is-draggable="draggable"

@@ -56,7 +56,7 @@ const props = withDefaults(defineProps<ItemPropsType>(), {
 const emit = defineEmits(['move', 'resize', 'moved', 'resized', 'containerResized'])
 const itemRef = ref<HTMLElement | null>()
 let instance: Interactable;
-const layout = inject<Omit<LayoutState & IGridLayout, 'layout'>>('layout', {})
+const layout = inject<Required<Omit<LayoutState & IGridLayout, 'layout'>>>('layout', {})
 
 
 const state = reactive<ItemState>({
@@ -486,6 +486,17 @@ const tryMakeResizable = () => {
       ignoreFrom: props.resizeIgnoreFrom,
       ...props.resizeOption,
     };
+    opts.modifiers = [
+      interact.modifiers.restrictSize({
+        min: {
+          height: minimum.height * state.transformScale,
+          width: minimum.width * state.transformScale
+        },
+        max: {
+          height: maximum.height * state.transformScale,
+          width: maximum.width * state.transformScale
+        }
+      },)]
 
     if (props.preserveAspectRatio) {
       opts.modifiers = [

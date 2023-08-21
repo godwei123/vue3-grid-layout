@@ -2,7 +2,7 @@
 import {onMounted, reactive,} from 'vue';
 import GridItem from './components/GridItem.vue';
 import GridLayout from './components/GridLayout.vue';
-import {getDocumentDir, setDocumentDir} from './utils/DOM';
+import {getDocumentDir, setDocumentDir} from './utils/helpers';
 
 const testLayout = [
   {x: 0, y: 0, w: 2, h: 2, i: '0', resizable: true, draggable: true, static: false, minY: 0, maxY: 2},

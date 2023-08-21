@@ -151,14 +151,14 @@ export type Events = {
 };
 
 export interface LayoutState {
-    width?: number | null,
-    mergeStyles?: CSSProperties,
-    lastLayoutLength?: number,
-    isDragging?: boolean,
-    placeholder?: IGridItem,
-    layouts?: IObject,
-    lastBreakpoint?: null | Breakpoint,
-    originalLayout?: null | Layout,
+    width: number | null,
+    mergeStyles: CSSProperties,
+    lastLayoutLength: number,
+    isDragging: boolean,
+    placeholder: IGridItem,
+    layouts: IObject,
+    lastBreakpoint: null | Breakpoint,
+    originalLayout: null | Layout,
 }
 
 export interface ItemState {

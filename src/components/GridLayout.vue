@@ -17,7 +17,7 @@
 import {nextTick, onBeforeMount, onBeforeUnmount, onMounted, provide, reactive, ref, toRefs, watch,} from "vue";
 import GridItem from "./GridItem.vue";
 import elementResizeDetectorMaker, {Erd} from "element-resize-detector"
-import {IGridLayout, Layout, LayoutState, Point} from "../types";
+import {IGridItem, IGridLayout, Layout, LayoutState, Point} from "../types";
 import {
   findDifference,
   findOrGenerateResponsiveLayout,
@@ -261,11 +261,7 @@ const resizeEventHandler = (params: [string, (string | number | symbol), number,
 const dragEventHandler = (params: [string, (string | number | symbol), number, number, number, number]) => {
   if (params === undefined) return
   const [eventName, id, x, y, h, w] = params
-  let l;
-  l = getLayoutItem(props.layout, id)
-  if (l === undefined || l === null) {
-    l = {x: 0, y: 0}
-  }
+  let l = getLayoutItem(props.layout, id) || {x: 0, y: 0} as IGridItem
   if (eventName === "dragstart" && !props.verticalCompact) {
     positionsBeforeDrag = props.layout.reduce((result, {i, x, y}) => ({
       ...result,
@@ -288,7 +284,7 @@ const dragEventHandler = (params: [string, (string | number | symbol), number, n
       state.isDragging = false;
     });
   }
-  const newLayout = moveElement(props.layout, l, true, props.preventCollision, x, y);
+  const newLayout = moveElement(props.layout, l, true, x, y, props.preventCollision);
   emit('update:layout', newLayout)
   if (props.restoreOnDrag) {
     l.static = true;

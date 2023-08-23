@@ -1,15 +1,7 @@
 import {CSSProperties} from "vue";
-import _NativePointerEventType from "@interactjs/core/NativePointerEventType";
-import {InteractEvent} from "@interactjs/core/InteractEvent";
-import {ListenerMap} from "@interactjs/core/types";
 
 export type ISize = 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
 export type Dir = "ltr" | "rtl" | "auto"
-
-export type Element = HTMLElement | SVGElement;
-export type Context = Document | Element;
-export type EventTarget = Window | Document | Element;
-export type Target = EventTarget | string;
 
 export interface Point {
     x: number;
@@ -20,6 +12,10 @@ export interface Size {
     width: number;
     height: number;
 }
+
+export type PositionRight = { top: number, width: number, right: number, height: number }
+export type PositionLeft = { top: number, left: number, width: number, height: number };
+export type Position = PositionLeft | PositionRight
 
 export interface Rect {
     top: number;
@@ -35,12 +31,8 @@ export type RectFunction<T extends any[]> = (...args: T) => Rect | Element;
 export type RectResolvable<T extends any[]> = Rect | string | Element | RectFunction<T>;
 export type Dimensions = Point & Size;
 
-export type NativePointerEventType = typeof _NativePointerEventType;
-export type PointerEventType = MouseEvent | TouchEvent | Partial<NativePointerEventType> | InteractEvent;
-export type PointerType = MouseEvent | Touch | Partial<NativePointerEventType> | InteractEvent;
-export type EventTypes = string | ListenerMap | Array<string | ListenerMap>;
 
-export type CallBackFunction = (...args: any) => any;
+export type CallBackFunction = (...args: any) => void;
 
 export type LayoutItemRequired = {
     w: number,
@@ -63,13 +55,6 @@ export type ItemPropsType = IGridItem & {
     margin?: [number, number]
 }
 
-export type Position = {
-    left?: number,
-    top: number,
-    width: number,
-    height: number
-    right?: number;
-};
 
 export type EleSize = {
     width: number,
@@ -120,38 +105,8 @@ export interface IGridLayout {
 }
 
 
-export type Events = {
-    updateWidth?: any,
-    compact?: any,
-    setDraggable: boolean,
-    setResizable: boolean,
-    setRowHeight: number,
-    setMaxRows: number,
-    setColNum: string | number,
-    setBounded: boolean
-    directionChange?: any,
-    setTransformScale?: any
-    setResizeable?: boolean
-    resizeEvent: ([
-        eventName: string,
-        id: string | number | symbol,
-        x: number,
-        y: number,
-        h: number,
-        w: number
-    ]) | undefined
-    dragEvent: [
-        eventName: string,
-        id: string | number | symbol,
-        x: number,
-        y: number,
-        h: number,
-        w: number
-    ],
-};
-
 export interface LayoutState {
-    width: number | null,
+    width: number,
     mergeStyles: CSSProperties,
     lastLayoutLength: number,
     isDragging: boolean,

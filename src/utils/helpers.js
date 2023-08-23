@@ -7,57 +7,57 @@ export const emitter = mitt();
 
 
 export const clamp = (num, lowerBound, upperBound) => {
-  return Math.max(Math.min(num, upperBound), lowerBound);
+    return Math.max(Math.min(num, upperBound), lowerBound);
 }
 export const calcGridItemWHPx = (gridUnits, colOrRowSize, marginPx) => {
-  if (!Number.isFinite(gridUnits)) return gridUnits;
-  return Math.round(
-    colOrRowSize * gridUnits + Math.max(0, gridUnits - 1) * marginPx
-  );
+    if (!Number.isFinite(gridUnits)) return gridUnits;
+    return Math.round(
+        colOrRowSize * gridUnits + Math.max(0, gridUnits - 1) * marginPx
+    );
 }
 
 export const findDifference = (layout, originalLayout) => {
-  let uniqueResultOne = layout.filter(function (obj) {
-    return !originalLayout.some(function (obj2) {
-      return obj.i === obj2.i;
+    let uniqueResultOne = layout.filter(function (obj) {
+        return !originalLayout.some(function (obj2) {
+            return obj.i === obj2.i;
+        });
     });
-  });
 
-  let uniqueResultTwo = originalLayout.filter(function (obj) {
-    return !layout.some(function (obj2) {
-      return obj.i === obj2.i;
+    let uniqueResultTwo = originalLayout.filter(function (obj) {
+        return !layout.some(function (obj2) {
+            return obj.i === obj2.i;
+        });
     });
-  });
-  return uniqueResultOne.concat(uniqueResultTwo);
+    return uniqueResultOne.concat(uniqueResultTwo);
 }
 
 function hasDocument() {
-  return (typeof document !== 'undefined');
+    return (typeof document !== 'undefined');
 }
 
 function hasWindow() {
-  return (typeof window !== 'undefined');
+    return (typeof window !== 'undefined');
 }
 
 export function getDocumentDir() {
-  if (!hasDocument()) {
-    return currentDir;
-  }
-  const direction = (typeof document.dir !== 'undefined')
-    ? document.dir
-    : document.getElementsByTagName('html')[0].getAttribute('dir');
-  return direction;
+    if (!hasDocument()) {
+        return currentDir;
+    }
+    const direction = (typeof document.dir !== 'undefined')
+        ? document.dir
+        : document.getElementsByTagName('html')[0].getAttribute('dir');
+    return direction;
 }
 
 // export function setDocumentDir(dir: "ltr" | "rtl" | "auto"){
 export function setDocumentDir(dir) {
-  if (!hasDocument) {
-    currentDir = dir;
-    return;
-  }
+    if (!hasDocument) {
+        currentDir = dir;
+        return;
+    }
 
-  const html = document.getElementsByTagName('html')[0];
-  html.setAttribute('dir', dir);
+    const html = document.getElementsByTagName('html')[0];
+    html.setAttribute('dir', dir);
 }
 
 const cb = () => {
@@ -65,76 +65,76 @@ const cb = () => {
 
 // export function addWindowEventListener(event:string, callback: () => mixed){
 export function addWindowEventListener(event, callback = cb) {
-  if (!hasWindow) {
-    callback();
-    return;
-  }
-  window.addEventListener(event, callback);
+    if (!hasWindow) {
+        callback();
+        return;
+    }
+    window.addEventListener(event, callback);
 }
 
 export function removeWindowEventListener(event, callback = cb) {
-  if (!hasWindow) {
-    return;
-  }
-  window.removeEventListener(event, callback);
+    if (!hasWindow) {
+        return;
+    }
+    window.removeEventListener(event, callback);
 }
 
 
 // Get {x, y} positions from event.
 export function getControlPosition(e) {
-  return offsetXYFromParentOf(e);
+    return offsetXYFromParentOf(e);
 }
 
 
 // Get from offsetParent
 export function offsetXYFromParentOf(evt) {
-  const offsetParent = evt.target.offsetParent || document.body;
-  const offsetParentRect = evt.offsetParent === document.body ? {
-    left: 0,
-    top: 0
-  } : offsetParent.getBoundingClientRect();
+    const offsetParent = evt.target.offsetParent || document.body;
+    const offsetParentRect = evt.offsetParent === document.body ? {
+        left: 0,
+        top: 0
+    } : offsetParent.getBoundingClientRect();
 
-  const x = evt.clientX + offsetParent.scrollLeft - offsetParentRect.left;
-  const y = evt.clientY + offsetParent.scrollTop - offsetParentRect.top;
+    const x = evt.clientX + offsetParent.scrollLeft - offsetParentRect.left;
+    const y = evt.clientY + offsetParent.scrollTop - offsetParentRect.top;
 
-  /* const x = Math.round(evt.clientX + offsetParent.scrollLeft - offsetParentRect.left);
-    const y = Math.round(evt.clientY + offsetParent.scrollTop - offsetParentRect.top); */
+    /* const x = Math.round(evt.clientX + offsetParent.scrollLeft - offsetParentRect.left);
+      const y = Math.round(evt.clientY + offsetParent.scrollTop - offsetParentRect.top); */
 
 
-  return {x, y};
+    return {x, y};
 }
 
 
 // Create an data object exposed by <DraggableCore>'s events
 export function createCoreData(lastX, lastY, x, y) {
-  // State changes are often (but not always!) async. We want the latest value.
-  const isStart = !isNum(lastX);
+    // State changes are often (but not always!) async. We want the latest value.
+    const isStart = !isNum(lastX);
 
-  if (isStart) {
-    // If this is our first move, use the x and y as last coords.
+    if (isStart) {
+        // If this is our first move, use the x and y as last coords.
+        return {
+            deltaX: 0,
+            deltaY: 0,
+            lastX: x,
+            lastY: y,
+            x,
+            y,
+        };
+    }
+    // Otherwise calculate proper values.
     return {
-      deltaX: 0,
-      deltaY: 0,
-      lastX: x,
-      lastY: y,
-      x,
-      y,
+        deltaX: x - lastX,
+        deltaY: y - lastY,
+        lastX,
+        lastY,
+        x,
+        y,
     };
-  }
-  // Otherwise calculate proper values.
-  return {
-    deltaX: x - lastX,
-    deltaY: y - lastY,
-    lastX,
-    lastY,
-    x,
-    y,
-  };
 }
 
 
 function isNum(num) {
-  return typeof num === 'number' && !Number.isNaN(num);
+    return typeof num === 'number' && !Number.isNaN(num);
 }
 
 // @flow
@@ -153,13 +153,13 @@ function isNum(num) {
  */
 // export function getBreakpointFromWidth(breakpoints: Breakpoints, width: number): Breakpoint {
 export function getBreakpointFromWidth(breakpoints, width) {
-  const sorted = sortBreakpoints(breakpoints);
-  let matching = sorted[0];
-  for (let i = 1, len = sorted.length; i < len; i++) {
-    const breakpointName = sorted[i];
-    if (width > breakpoints[breakpointName]) matching = breakpointName;
-  }
-  return matching;
+    const sorted = sortBreakpoints(breakpoints);
+    let matching = sorted[0];
+    for (let i = 1, len = sorted.length; i < len; i++) {
+        const breakpointName = sorted[i];
+        if (width > breakpoints[breakpointName]) matching = breakpointName;
+    }
+    return matching;
 }
 
 
@@ -171,10 +171,10 @@ export function getBreakpointFromWidth(breakpoints, width) {
  */
 // export function getColsFromBreakpoint(breakpoint: Breakpoint, cols: Breakpoints): number {
 export function getColsFromBreakpoint(breakpoint, cols) {
-  if (!cols[breakpoint]) {
-    throw new Error(`ResponsiveGridLayout: \`cols\` entry for breakpoint ${breakpoint} is missing!`);
-  }
-  return cols[breakpoint];
+    if (!cols[breakpoint]) {
+        throw new Error(`ResponsiveGridLayout: \`cols\` entry for breakpoint ${breakpoint} is missing!`);
+    }
+    return cols[breakpoint];
 }
 
 /**
@@ -196,51 +196,51 @@ export function getColsFromBreakpoint(breakpoint, cols) {
 //                                                breakpoint: Breakpoint, lastBreakpoint: Breakpoint,
 //                                                cols: number, verticalCompact: boolean): Layout {
 export function findOrGenerateResponsiveLayout(
-  orgLayout,
-  layouts,
-  breakpoints,
-  breakpoint,
-  lastBreakpoint,
-  cols,
-  verticalCompact
+    orgLayout,
+    layouts,
+    breakpoints,
+    breakpoint,
+    lastBreakpoint,
+    cols,
+    verticalCompact
 ) {
-  // If it already exists, just return it.
-  if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
-  // Find or generate the next layout
-  let layout = orgLayout;
+    // If it already exists, just return it.
+    if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
+    // Find or generate the next layout
+    let layout = orgLayout;
 
-  const breakpointsSorted = sortBreakpoints(breakpoints);
-  const breakpointsAbove = breakpointsSorted.slice(breakpointsSorted.indexOf(breakpoint));
-  for (let i = 0, len = breakpointsAbove.length; i < len; i++) {
-    const b = breakpointsAbove[i];
-    if (layouts[b]) {
-      layout = layouts[b];
-      break;
+    const breakpointsSorted = sortBreakpoints(breakpoints);
+    const breakpointsAbove = breakpointsSorted.slice(breakpointsSorted.indexOf(breakpoint));
+    for (let i = 0, len = breakpointsAbove.length; i < len; i++) {
+        const b = breakpointsAbove[i];
+        if (layouts[b]) {
+            layout = layouts[b];
+            break;
+        }
     }
-  }
-  layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
-  return compact(correctBounds(layout, {cols}), verticalCompact);
+    layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
+    return compact(correctBounds(layout, {cols}), verticalCompact);
 }
 
 // export function generateResponsiveLayout(layout: Layout, breakpoints: Breakpoints,
 //                                                breakpoint: Breakpoint, lastBreakpoint: Breakpoint,
 //                                                cols: number, verticalCompact: boolean): Layout {
 export function generateResponsiveLayout(layout, breakpoints, breakpoint, lastBreakpoint, cols, verticalCompact) {
-  // If it already exists, just return it.
-  /* if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
-  // Find or generate the next layout
-  let layout = layouts[lastBreakpoint]; */
-  /* const breakpointsSorted = sortBreakpoints(breakpoints);
-  const breakpointsAbove = breakpointsSorted.slice(breakpointsSorted.indexOf(breakpoint));
-  for (let i = 0, len = breakpointsAbove.length; i < len; i++) {
-    const b = breakpointsAbove[i];
-    if (layouts[b]) {
-      layout = layouts[b];
-      break;
-    }
-  } */
-  layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
-  return compact(correctBounds(layout, {cols}), verticalCompact);
+    // If it already exists, just return it.
+    /* if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
+    // Find or generate the next layout
+    let layout = layouts[lastBreakpoint]; */
+    /* const breakpointsSorted = sortBreakpoints(breakpoints);
+    const breakpointsAbove = breakpointsSorted.slice(breakpointsSorted.indexOf(breakpoint));
+    for (let i = 0, len = breakpointsAbove.length; i < len; i++) {
+      const b = breakpointsAbove[i];
+      if (layouts[b]) {
+        layout = layouts[b];
+        break;
+      }
+    } */
+    layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
+    return compact(correctBounds(layout, {cols}), verticalCompact);
 }
 
 /**
@@ -252,11 +252,11 @@ export function generateResponsiveLayout(layout, breakpoints, breakpoint, lastBr
  */
 // export function sortBreakpoints(breakpoints: Breakpoints): Array<Breakpoint> {
 export function sortBreakpoints(breakpoints) {
-  // const keys: Array<string> = Object.keys(breakpoints);
-  const keys = Object.keys(breakpoints);
-  return keys.sort((a, b) => {
-    return breakpoints[a] - breakpoints[b];
-  });
+    // const keys: Array<string> = Object.keys(breakpoints);
+    const keys = Object.keys(breakpoints);
+    return keys.sort((a, b) => {
+        return breakpoints[a] - breakpoints[b];
+    });
 }
 
 // @flow
@@ -288,35 +288,35 @@ export type DragCallbackData = {
  */
 // export function bottom(layout: Layout): number {
 export function bottom(layout) {
-  let max = 0;
-  let bottomY;
-  for (let i = 0, len = layout.length; i < len; i++) {
-    bottomY = layout[i].y + layout[i].h;
-    if (bottomY > max) max = bottomY;
-  }
-  return max;
+    let max = 0;
+    let bottomY;
+    for (let i = 0, len = layout.length; i < len; i++) {
+        bottomY = layout[i].y + layout[i].h;
+        if (bottomY > max) max = bottomY;
+    }
+    return max;
 }
 
 // export function cloneLayout(layout: Layout): Layout {
 export function cloneLayout(layout) {
-  const newLayout = Array(layout.length);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    newLayout[i] = cloneLayoutItem(layout[i]);
-  }
-  return newLayout;
+    const newLayout = Array(layout.length);
+    for (let i = 0, len = layout.length; i < len; i++) {
+        newLayout[i] = cloneLayoutItem(layout[i]);
+    }
+    return newLayout;
 }
 
 // Fast path to cloning, since this is monomorphic
 // export function cloneLayoutItem(layoutItem: LayoutItem): LayoutItem {
 export function cloneLayoutItem(layoutItem) {
-  /* return {
-    w: layoutItem.w, h: layoutItem.h, x: layoutItem.x, y: layoutItem.y, i: layoutItem.i,
-    minW: layoutItem.minW, maxW: layoutItem.maxW, minH: layoutItem.minH, maxH: layoutItem.maxH,
-    moved: Boolean(layoutItem.moved), static: Boolean(layoutItem.static),
-    // These can be null
-    isDraggable: layoutItem.isDraggable, isResizable: layoutItem.isResizable
-  }; */
-  return JSON.parse(JSON.stringify(layoutItem));
+    /* return {
+      w: layoutItem.w, h: layoutItem.h, x: layoutItem.x, y: layoutItem.y, i: layoutItem.i,
+      minW: layoutItem.minW, maxW: layoutItem.maxW, minH: layoutItem.minH, maxH: layoutItem.maxH,
+      moved: Boolean(layoutItem.moved), static: Boolean(layoutItem.static),
+      // These can be null
+      isDraggable: layoutItem.isDraggable, isResizable: layoutItem.isResizable
+    }; */
+    return JSON.parse(JSON.stringify(layoutItem));
 }
 
 /**
@@ -326,12 +326,12 @@ export function cloneLayoutItem(layoutItem) {
  */
 // export function collides(l1: LayoutItem, l2: LayoutItem): boolean {
 export function collides(l1, l2) {
-  if (l1 === l2) return false; // same element
-  if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
-  if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
-  if (l1.y + l1.h <= l2.y) return false; // l1 is above l2
-  if (l1.y >= l2.y + l2.h) return false; // l1 is below l2
-  return true; // boxes overlap
+    if (l1 === l2) return false; // same element
+    if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
+    if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
+    if (l1.y + l1.h <= l2.y) return false; // l1 is above l2
+    if (l1.y >= l2.y + l2.h) return false; // l1 is below l2
+    return true; // boxes overlap
 }
 
 /**
@@ -346,33 +346,33 @@ export function collides(l1, l2) {
  */
 // export function compact(layout: Layout, verticalCompact: Boolean, minPositions): Layout {
 export function compact(layout, verticalCompact, minPositions) {
-  // Statics go in the compareWith array right away so items flow around them.
-  const compareWith = getStatics(layout);
-  // We go through the items by row and column.
-  const sorted = sortLayoutItemsByRowCol(layout);
-  // Holding for new items.
-  const out = Array(layout.length);
+    // Statics go in the compareWith array right away so items flow around them.
+    const compareWith = getStatics(layout);
+    // We go through the items by row and column.
+    const sorted = sortLayoutItemsByRowCol(layout);
+    // Holding for new items.
+    const out = Array(layout.length);
 
-  for (let i = 0, len = sorted.length; i < len; i++) {
-    let l = sorted[i];
+    for (let i = 0, len = sorted.length; i < len; i++) {
+        let l = sorted[i];
 
-    // Don't move static elements
-    if (!l.static) {
-      l = compactItem(compareWith, l, verticalCompact, minPositions);
+        // Don't move static elements
+        if (!l.static) {
+            l = compactItem(compareWith, l, verticalCompact, minPositions);
 
-      // Add to comparison array. We only collide with items before this one.
-      // Statics are already in this array.
-      compareWith.push(l);
+            // Add to comparison array. We only collide with items before this one.
+            // Statics are already in this array.
+            compareWith.push(l);
+        }
+
+        // Add to output array to make sure they still come out in the right order.
+        out[layout.indexOf(l)] = l;
+
+        // Clear moved flag, if it exists.
+        l.moved = false;
     }
 
-    // Add to output array to make sure they still come out in the right order.
-    out[layout.indexOf(l)] = l;
-
-    // Clear moved flag, if it exists.
-    l.moved = false;
-  }
-
-  return out;
+    return out;
 }
 
 /**
@@ -380,24 +380,24 @@ export function compact(layout, verticalCompact, minPositions) {
  */
 // export function compactItem(compareWith: Layout, l: LayoutItem, verticalCompact: boolean, minPositions): LayoutItem {
 export function compactItem(compareWith, l, verticalCompact, minPositions) {
-  if (verticalCompact) {
-    // Move the element up as far as it can go without colliding.
-    while (l.y > 0 && !getFirstCollision(compareWith, l)) {
-      l.y--;
+    if (verticalCompact) {
+        // Move the element up as far as it can go without colliding.
+        while (l.y > 0 && !getFirstCollision(compareWith, l)) {
+            l.y--;
+        }
+    } else if (minPositions) {
+        const minY = minPositions[l.i].y;
+        while (l.y > minY && !getFirstCollision(compareWith, l)) {
+            l.y--;
+        }
     }
-  } else if (minPositions) {
-    const minY = minPositions[l.i].y;
-    while (l.y > minY && !getFirstCollision(compareWith, l)) {
-      l.y--;
-    }
-  }
 
-  // Move it down, and keep moving it down if it's colliding.
-  let collides;
-  while ((collides = getFirstCollision(compareWith, l))) {
-    l.y = collides.y + collides.h;
-  }
-  return l;
+    // Move it down, and keep moving it down if it's colliding.
+    let collides;
+    while ((collides = getFirstCollision(compareWith, l))) {
+        l.y = collides.y + collides.h;
+    }
+    return l;
 }
 
 /**
@@ -408,26 +408,26 @@ export function compactItem(compareWith, l, verticalCompact, minPositions) {
  */
 // export function correctBounds(layout: Layout, bounds: {cols: number}): Layout {
 export function correctBounds(layout, bounds) {
-  const collidesWith = getStatics(layout);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    const l = layout[i];
-    // Overflows right
-    if (l.x + l.w > bounds.cols) l.x = bounds.cols - l.w;
-    // Overflows left
-    if (l.x < 0) {
-      l.x = 0;
-      l.w = bounds.cols;
+    const collidesWith = getStatics(layout);
+    for (let i = 0, len = layout.length; i < len; i++) {
+        const l = layout[i];
+        // Overflows right
+        if (l.x + l.w > bounds.cols) l.x = bounds.cols - l.w;
+        // Overflows left
+        if (l.x < 0) {
+            l.x = 0;
+            l.w = bounds.cols;
+        }
+        if (!l.static) collidesWith.push(l);
+        else {
+            // If this is static and collides with other statics, we must move it down.
+            // We have to do something nicer than just letting them overlap.
+            while (getFirstCollision(collidesWith, l)) {
+                l.y++;
+            }
+        }
     }
-    if (!l.static) collidesWith.push(l);
-    else {
-      // If this is static and collides with other statics, we must move it down.
-      // We have to do something nicer than just letting them overlap.
-      while (getFirstCollision(collidesWith, l)) {
-        l.y++;
-      }
-    }
-  }
-  return layout;
+    return layout;
 }
 
 /**
@@ -439,9 +439,9 @@ export function correctBounds(layout, bounds) {
  */
 // export function getLayoutItem(layout: Layout, id: string): ?LayoutItem {
 export function getLayoutItem(layout, id) {
-  for (let i = 0, len = layout.length; i < len; i++) {
-    if (layout[i].i === id) return layout[i];
-  }
+    for (let i = 0, len = layout.length; i < len; i++) {
+        if (layout[i].i === id) return layout[i];
+    }
 }
 
 /**
@@ -454,14 +454,14 @@ export function getLayoutItem(layout, id) {
  */
 // export function getFirstCollision(layout: Layout, layoutItem: LayoutItem): ?LayoutItem {
 export function getFirstCollision(layout, layoutItem) {
-  for (let i = 0, len = layout.length; i < len; i++) {
-    if (collides(layout[i], layoutItem)) return layout[i];
-  }
+    for (let i = 0, len = layout.length; i < len; i++) {
+        if (collides(layout[i], layoutItem)) return layout[i];
+    }
 }
 
 // export function getAllCollisions(layout: Layout, layoutItem: LayoutItem): Array<LayoutItem> {
 export function getAllCollisions(layout, layoutItem) {
-  return layout.filter((l) => collides(l, layoutItem));
+    return layout.filter((l) => collides(l, layoutItem));
 }
 
 /**
@@ -471,8 +471,8 @@ export function getAllCollisions(layout, layoutItem) {
  */
 // export function getStatics(layout: Layout): Array<LayoutItem> {
 export function getStatics(layout) {
-  // return [];
-  return layout.filter((l) => l.static);
+    // return [];
+    return layout.filter((l) => l.static);
 }
 
 /**
@@ -487,55 +487,55 @@ export function getStatics(layout) {
  */
 // export function moveElement(layout: Layout, l: LayoutItem, x: Number, y: Number, isUserAction: Boolean, preventCollision: Boolean): Layout {
 export function moveElement(layout, l, x, y, isUserAction, preventCollision) {
-  if (l.static) return layout;
+    if (l.static) return layout;
 
-  // Short-circuit if nothing to do.
-  // if (l.y === y && l.x === x) return layout;
+    // Short-circuit if nothing to do.
+    // if (l.y === y && l.x === x) return layout;
 
-  const oldX = l.x;
-  const oldY = l.y;
+    const oldX = l.x;
+    const oldY = l.y;
 
-  const movingUp = y && l.y > y;
-  // This is quite a bit faster than extending the object
-  if (typeof x === 'number') l.x = x;
-  if (typeof y === 'number') l.y = y;
-  l.moved = true;
+    const movingUp = y && l.y > y;
+    // This is quite a bit faster than extending the object
+    if (typeof x === 'number') l.x = x;
+    if (typeof y === 'number') l.y = y;
+    l.moved = true;
 
-  // If this collides with anything, move it.
-  // When doing this comparison, we have to sort the items we compare with
-  // to ensure, in the case of multiple collisions, that we're getting the
-  // nearest collision.
-  let sorted = sortLayoutItemsByRowCol(layout);
-  if (movingUp) sorted = sorted.reverse();
-  const collisions = getAllCollisions(sorted, l);
+    // If this collides with anything, move it.
+    // When doing this comparison, we have to sort the items we compare with
+    // to ensure, in the case of multiple collisions, that we're getting the
+    // nearest collision.
+    let sorted = sortLayoutItemsByRowCol(layout);
+    if (movingUp) sorted = sorted.reverse();
+    const collisions = getAllCollisions(sorted, l);
 
-  if (preventCollision && collisions.length) {
-    l.x = oldX;
-    l.y = oldY;
-    l.moved = false;
-    return layout;
-  }
-
-  // Move each item that collides away from this element.
-  for (let i = 0, len = collisions.length; i < len; i++) {
-    const collision = collisions[i];
-    // console.log('resolving collision between', l.i, 'at', l.y, 'and', collision.i, 'at', collision.y);
-
-    // Short circuit so we can't infinite loop
-    if (collision.moved) continue;
-
-    // This makes it feel a bit more precise by waiting to swap for just a bit when moving up.
-    if (l.y > collision.y && l.y - collision.y > collision.h / 4) continue;
-
-    // Don't move static items - we have to move *this* element away
-    if (collision.static) {
-      layout = moveElementAwayFromCollision(layout, collision, l, isUserAction);
-    } else {
-      layout = moveElementAwayFromCollision(layout, l, collision, isUserAction);
+    if (preventCollision && collisions.length) {
+        l.x = oldX;
+        l.y = oldY;
+        l.moved = false;
+        return layout;
     }
-  }
 
-  return layout;
+    // Move each item that collides away from this element.
+    for (let i = 0, len = collisions.length; i < len; i++) {
+        const collision = collisions[i];
+        // console.log('resolving collision between', l.i, 'at', l.y, 'and', collision.i, 'at', collision.y);
+
+        // Short circuit so we can't infinite loop
+        if (collision.moved) continue;
+
+        // This makes it feel a bit more precise by waiting to swap for just a bit when moving up.
+        if (l.y > collision.y && l.y - collision.y > collision.h / 4) continue;
+
+        // Don't move static items - we have to move *this* element away
+        if (collision.static) {
+            layout = moveElementAwayFromCollision(layout, collision, l, isUserAction);
+        } else {
+            layout = moveElementAwayFromCollision(layout, l, collision, isUserAction);
+        }
+    }
+
+    return layout;
 }
 
 /**
@@ -551,29 +551,29 @@ export function moveElement(layout, l, x, y, isUserAction, preventCollision) {
 // export function moveElementAwayFromCollision(layout: Layout, collidesWith: LayoutItem,
 //                                              itemToMove: LayoutItem, isUserAction: ?boolean): Layout {
 export function moveElementAwayFromCollision(layout, collidesWith, itemToMove, isUserAction) {
-  const preventCollision = false; // we're already colliding
-  // If there is enough space above the collision to put this element, move it there.
-  // We only do this on the main collision as this can get funky in cascades and cause
-  // unwanted swapping behavior.
-  if (isUserAction) {
-    // Make a mock item so we don't modify the item here, only modify in moveElement.
-    // const fakeItem: LayoutItem = {
-    const fakeItem = {
-      x: itemToMove.x,
-      y: itemToMove.y,
-      w: itemToMove.w,
-      h: itemToMove.h,
-      i: '-1',
-    };
-    fakeItem.y = Math.max(collidesWith.y - itemToMove.h, 0);
-    if (!getFirstCollision(layout, fakeItem)) {
-      return moveElement(layout, itemToMove, undefined, fakeItem.y, preventCollision);
+    const preventCollision = false; // we're already colliding
+    // If there is enough space above the collision to put this element, move it there.
+    // We only do this on the main collision as this can get funky in cascades and cause
+    // unwanted swapping behavior.
+    if (isUserAction) {
+        // Make a mock item so we don't modify the item here, only modify in moveElement.
+        // const fakeItem: LayoutItem = {
+        const fakeItem = {
+            x: itemToMove.x,
+            y: itemToMove.y,
+            w: itemToMove.w,
+            h: itemToMove.h,
+            i: '-1',
+        };
+        fakeItem.y = Math.max(collidesWith.y - itemToMove.h, 0);
+        if (!getFirstCollision(layout, fakeItem)) {
+            return moveElement(layout, itemToMove, undefined, fakeItem.y, preventCollision);
+        }
     }
-  }
 
-  // Previously this was optimized to move below the collision directly, but this can cause problems
-  // with cascading moves, as an item may actually leapflog a collision and cause a reversal in order.
-  return moveElement(layout, itemToMove, undefined, itemToMove.y + 1, preventCollision);
+    // Previously this was optimized to move below the collision directly, but this can cause problems
+    // with cascading moves, as an item may actually leapflog a collision and cause a reversal in order.
+    return moveElement(layout, itemToMove, undefined, itemToMove.y + 1, preventCollision);
 }
 
 /**
@@ -584,59 +584,46 @@ export function moveElementAwayFromCollision(layout, collidesWith, itemToMove, i
  */
 // export function perc(num: number): string {
 export function perc(num) {
-  return `${num * 100}%`;
+    return `${num * 100}%`;
 }
 
 // export function setTransform(top, left, width, height): Object {
 export function setTransform(top, left, width, height) {
-  // Replace unitless items with px
-  const translate = `translate3d(${left}px,${top}px, 0)`;
-  return {
-    transform: translate,
-    WebkitTransform: translate,
-    MozTransform: translate,
-    msTransform: translate,
-    OTransform: translate,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: 'absolute',
-  };
+    // Replace unitless items with px
+    const translate = `translate3d(${left}px,${top}px, 0)`;
+    return {
+        transform: translate,
+        WebkitTransform: translate,
+        MozTransform: translate,
+        msTransform: translate,
+        OTransform: translate,
+        width: `${width}px`,
+        height: `${height}px`,
+        position: 'absolute',
+    };
 }
 
-/**
- * Just like the setTransform method, but instead it will return a negative value of right.
- *
- * @param top
- * @param right
- * @param width
- * @param height
- * @returns {{transform: string, WebkitTransform: string, MozTransform: string, msTransform: string, OTransform: string, width: string, height: string, position: string}}
- */
-// export function setTransformRtl(top, right, width, height): Object {
+// export function setTransformRtl(top, right, width, height):  {
 export function setTransformRtl(top, right, width, height) {
-  // Replace unitless items with px
-  const translate = `translate3d(${right * -1}px,${top}px, 0)`;
-  return {
-    transform: translate,
-    WebkitTransform: translate,
-    MozTransform: translate,
-    msTransform: translate,
-    OTransform: translate,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: 'absolute',
-  };
+    // Replace unitless items with px
+    const translate = `translate3d(${right * -1}px,${top}px, 0)`;
+    return {
+        transform: translate,
+        width: `${width}px`,
+        height: `${height}px`,
+        position: 'absolute',
+    };
 }
 
 // export function setTopLeft(top, left, width, height): Object {
 export function setTopLeft(top, left, width, height) {
-  return {
-    top: `${top}px`,
-    left: `${left}px`,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: 'absolute',
-  };
+    return {
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        position: 'absolute',
+    };
 }
 
 /**
@@ -650,13 +637,13 @@ export function setTopLeft(top, left, width, height) {
  */
 // export function setTopRight(top, right, width, height): Object {
 export function setTopRight(top, right, width, height) {
-  return {
-    top: `${top}px`,
-    right: `${right}px`,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: 'absolute',
-  };
+    return {
+        top: `${top}px`,
+        right: `${right}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        position: 'absolute',
+    };
 }
 
 
@@ -668,17 +655,17 @@ export function setTopRight(top, right, width, height) {
  */
 // export function sortLayoutItemsByRowCol(layout: Layout): Layout {
 export function sortLayoutItemsByRowCol(layout) {
-  return [].concat(layout).sort((a, b) => {
-    if (a.y === b.y && a.x === b.x) {
-      return 0;
-    }
+    return [].concat(layout).sort((a, b) => {
+        if (a.y === b.y && a.x === b.x) {
+            return 0;
+        }
 
-    if (a.y > b.y || (a.y === b.y && a.x > b.x)) {
-      return 1;
-    }
+        if (a.y > b.y || (a.y === b.y && a.x > b.x)) {
+            return 1;
+        }
 
-    return -1;
-  });
+        return -1;
+    });
 }
 
 /**
@@ -751,41 +738,41 @@ export function synchronizeLayoutWithChildren(initialLayout: Layout, children: A
  */
 // export function validateLayout(layout: Layout, contextName: string): void {
 export function validateLayout(layout, contextName) {
-  contextName = contextName || 'Layout';
-  const subProps = ['x', 'y', 'w', 'h'];
-  const keyArr = [];
-  if (!Array.isArray(layout)) throw new Error(`${contextName} must be an array!`);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    const item = layout[i];
-    for (let j = 0; j < subProps.length; j++) {
-      if (typeof item[subProps[j]] !== 'number') {
-        throw new Error(`VueGridLayout: ${contextName}[${i}].${subProps[j]} must be a number!`);
-      }
-    }
+    contextName = contextName || 'Layout';
+    const subProps = ['x', 'y', 'w', 'h'];
+    const keyArr = [];
+    if (!Array.isArray(layout)) throw new Error(`${contextName} must be an array!`);
+    for (let i = 0, len = layout.length; i < len; i++) {
+        const item = layout[i];
+        for (let j = 0; j < subProps.length; j++) {
+            if (typeof item[subProps[j]] !== 'number') {
+                throw new Error(`VueGridLayout: ${contextName}[${i}].${subProps[j]} must be a number!`);
+            }
+        }
 
-    if (item.i === undefined || item.i === null) {
-      throw new Error(`VueGridLayout: ${contextName}[${i}].i cannot be null!`);
-    }
+        if (item.i === undefined || item.i === null) {
+            throw new Error(`VueGridLayout: ${contextName}[${i}].i cannot be null!`);
+        }
 
-    if (typeof item.i !== 'number' && typeof item.i !== 'string') {
-      throw new Error(`VueGridLayout: ${contextName}[${i}].i must be a string or number!`);
-    }
+        if (typeof item.i !== 'number' && typeof item.i !== 'string') {
+            throw new Error(`VueGridLayout: ${contextName}[${i}].i must be a string or number!`);
+        }
 
-    if (keyArr.indexOf(item.i) >= 0) {
-      throw new Error(`VueGridLayout: ${contextName}[${i}].i must be unique!`);
-    }
-    keyArr.push(item.i);
+        if (keyArr.indexOf(item.i) >= 0) {
+            throw new Error(`VueGridLayout: ${contextName}[${i}].i must be unique!`);
+        }
+        keyArr.push(item.i);
 
-    if (item.static !== undefined && typeof item.static !== 'boolean') {
-      throw new Error(`VueGridLayout: ${contextName}[${i}].static must be a boolean!`);
+        if (item.static !== undefined && typeof item.static !== 'boolean') {
+            throw new Error(`VueGridLayout: ${contextName}[${i}].static must be a boolean!`);
+        }
     }
-  }
 }
 
 // Flow can't really figure this out, so we just use Object
 // export function autoBindHandlers(el: Object, fns: Array<string>): void {
 export function autoBindHandlers(el, fns) {
-  fns.forEach((key) => el[key] = el[key].bind(el));
+    fns.forEach((key) => el[key] = el[key].bind(el));
 }
 
 
@@ -795,55 +782,55 @@ export function autoBindHandlers(el, fns) {
  * @returns {string}
  */
 export function createMarkup(obj) {
-  const keys = Object.keys(obj);
-  if (!keys.length) return '';
-  let i;
-  const
-    len = keys.length;
-  let result = '';
+    const keys = Object.keys(obj);
+    if (!keys.length) return '';
+    let i;
+    const
+        len = keys.length;
+    let result = '';
 
-  for (i = 0; i < len; i++) {
-    const key = keys[i];
-    const val = obj[key];
-    result += `${hyphenate(key)}:${addPx(key, val)};`;
-  }
+    for (i = 0; i < len; i++) {
+        const key = keys[i];
+        const val = obj[key];
+        result += `${hyphenate(key)}:${addPx(key, val)};`;
+    }
 
-  return result;
+    return result;
 }
 
 
 /* The following list is defined in React's core */
 export const IS_UNITLESS = {
-  animationIterationCount: true,
-  boxFlex: true,
-  boxFlexGroup: true,
-  boxOrdinalGroup: true,
-  columnCount: true,
-  flex: true,
-  flexGrow: true,
-  flexPositive: true,
-  flexShrink: true,
-  flexNegative: true,
-  flexOrder: true,
-  gridRow: true,
-  gridColumn: true,
-  fontWeight: true,
-  lineClamp: true,
-  lineHeight: true,
-  opacity: true,
-  order: true,
-  orphans: true,
-  tabSize: true,
-  widows: true,
-  zIndex: true,
-  zoom: true,
+    animationIterationCount: true,
+    boxFlex: true,
+    boxFlexGroup: true,
+    boxOrdinalGroup: true,
+    columnCount: true,
+    flex: true,
+    flexGrow: true,
+    flexPositive: true,
+    flexShrink: true,
+    flexNegative: true,
+    flexOrder: true,
+    gridRow: true,
+    gridColumn: true,
+    fontWeight: true,
+    lineClamp: true,
+    lineHeight: true,
+    opacity: true,
+    order: true,
+    orphans: true,
+    tabSize: true,
+    widows: true,
+    zIndex: true,
+    zoom: true,
 
-  // SVG-related properties
-  fillOpacity: true,
-  stopOpacity: true,
-  strokeDashoffset: true,
-  strokeOpacity: true,
-  strokeWidth: true,
+    // SVG-related properties
+    fillOpacity: true,
+    stopOpacity: true,
+    strokeDashoffset: true,
+    strokeOpacity: true,
+    strokeWidth: true,
 };
 
 
@@ -854,10 +841,10 @@ export const IS_UNITLESS = {
  * @returns {*}
  */
 export function addPx(name, value) {
-  if (typeof value === 'number' && !IS_UNITLESS[name]) {
-    return `${value}px`;
-  }
-  return value;
+    if (typeof value === 'number' && !IS_UNITLESS[name]) {
+        return `${value}px`;
+    }
+    return value;
 }
 
 
@@ -871,7 +858,7 @@ export function addPx(name, value) {
 export const hyphenateRE = /([a-z\d])([A-Z])/g;
 
 export function hyphenate(str) {
-  return str.replace(hyphenateRE, '$1-$2').toLowerCase();
+    return str.replace(hyphenateRE, '$1-$2').toLowerCase();
 }
 
 
@@ -882,10 +869,10 @@ export function hyphenate(str) {
 // }
 
 export function findAndRemove(array, property, value) {
-  array.forEach((result, index) => {
-    if (result[property] === value) {
-      // Remove from array
-      array.splice(index, 1);
-    }
-  });
+    array.forEach((result, index) => {
+        if (result[property] === value) {
+            // Remove from array
+            array.splice(index, 1);
+        }
+    });
 }

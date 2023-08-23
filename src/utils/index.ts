@@ -1,21 +1,10 @@
-import mitt, {Emitter} from 'mitt'
-import {
-    Breakpoint,
-    Breakpoints,
-    CallBackFunction,
-    Dir,
-    Events,
-    IGridItem,
-    IObject,
-    Layout,
-    ResponsiveLayout
-} from "../types";
 import {CSSProperties} from "vue";
+import {CallBackFunction, Dir, IGridItem, Layout, Point} from "../types";
+import _ from 'lodash'
+import Interact from "@interactjs/types/index";
 
-export const emitter: Emitter<Events> = mitt<Events>();
 let currentDir: Dir = "auto";
 
-// 设置transform
 export function setTransform(top: number, left: number, width: number, height: number): CSSProperties {
     const translate = `translate3d(${left}px, ${top}px, 0)`
     return {
@@ -63,32 +52,6 @@ export function setTopRight(top: number, right: number, width: number, height: n
     }
 }
 
-// Get from offsetParent
-export function getControlPosition(evt: Event) {
-    const offsetParent = (evt.target as HTMLElement)?.offsetParent || document.body;
-    const offsetParentRect = (evt as any)?.offsetParent === document.body ? {
-        left: 0,
-        top: 0
-    } : offsetParent.getBoundingClientRect();
-    const x = (evt as MouseEvent).clientX + offsetParent.scrollLeft - offsetParentRect.left;
-    const y = (evt as MouseEvent).clientY + offsetParent.scrollTop - offsetParentRect.top;
-    return {x, y};
-}
-
-
-export function createCoreData(lastX: number, lastY: number, x: number, y: number) {
-    const isStart = Number.isNaN(lastX);
-    return {
-        deltaX: isStart ? 0 : x - lastX,
-        deltaY: isStart ? 0 : y - lastY,
-        lastX: x,
-        lastY: y,
-        x: x,
-        y: y
-    }
-}
-
-
 function hasDocument(): boolean {
     return (typeof document !== "undefined");
 }
@@ -117,7 +80,7 @@ export function setDocumentDir(dir: Dir) {
 }
 
 export function addWindowEventListener(event: string, callback: CallBackFunction) {
-    if (!hasWindow) {
+    if (!hasWindow()) {
         callback();
         return;
     }
@@ -125,108 +88,81 @@ export function addWindowEventListener(event: string, callback: CallBackFunction
 }
 
 export function removeWindowEventListener(event: string, callback: CallBackFunction) {
-    if (!hasWindow) {
+    if (!hasWindow()) {
         return;
     }
     window.removeEventListener(event, callback);
 }
 
 
-export function getBreakpointFromWidth(breakpoints: Breakpoints, width: number | null) {
-    if (!width) return
-    const sorted = sortBreakpoints(breakpoints);
-    let matching = sorted[0];
-    for (let i = 1, len = sorted.length; i < len; i++) {
-        const breakpointName = sorted[i];
-        if (width > breakpoints[breakpointName]!) matching = breakpointName;
-    }
-    return matching;
-}
-
-
-export function getColsFromBreakpoint(breakpoint: Breakpoint, cols: Breakpoints): number {
-    if (!cols[breakpoint]) {
-        throw new Error("ResponsiveGridLayout: `cols` entry for breakpoint " + breakpoint + " is missing!");
-    }
-    return cols[breakpoint]!;
-}
-
-
-export function findOrGenerateResponsiveLayout(orgLayout: Layout | null, layouts: ResponsiveLayout, breakpoints: Breakpoints,
-                                               breakpoint: Breakpoint,
-                                               cols: number, verticalCompact: boolean): Layout {
-    if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]!);
-
-    let layout = orgLayout;
-
-    const breakpointsSorted = sortBreakpoints(breakpoints);
-    const breakpointsAbove = breakpointsSorted.slice(breakpointsSorted.indexOf(breakpoint));
-    for (let i = 0, len = breakpointsAbove.length; i < len; i++) {
-        const b = breakpointsAbove[i];
-        if (layouts[b]) {
-            layout = layouts[b]!;
-            break;
-        }
-    }
-    layout = cloneLayout(layout || []);
-    return compact(correctBounds(layout, {cols: cols}), verticalCompact);
-}
-
-export function sortBreakpoints(breakpoints: Breakpoints) {
-    const keys = Object.keys(breakpoints) as Breakpoint[]
-    return keys.sort((a: Breakpoint, b: Breakpoint) => {
-        return breakpoints[a]! - breakpoints[b]!;
-    });
-}
-
-
-export function bottom(layout: Layout): number {
-    let max = 0, bottomY;
+export function validateLayout(layout: Layout, contextName: string = "Layout"): void {
+    const subProps: Array<'x' | 'y' | 'w' | 'h'> = ['x', 'y', 'w', 'h'];
+    let keys: (string | number | symbol)[] = [];
+    if (!Array.isArray(layout)) throw new Error(contextName + " must be an array!");
     for (let i = 0, len = layout.length; i < len; i++) {
-        bottomY = layout[i].y + layout[i].h;
-        if (bottomY > max) max = bottomY;
+        const item = layout[i];
+        for (let j = 0; j < subProps.length; j++) {
+            const t = subProps[j]
+            if (typeof item[t] !== 'number') {
+                throw new Error('VueGridLayout: ' + contextName + '[' + i + '].' + subProps[j] + ' must be a number!');
+            }
+        }
+        if (item.i === undefined || item.i === null) {
+            throw new Error('VueGridLayout: ' + contextName + '[' + i + '].i cannot be null!');
+        }
+        if (keys.includes(item.i)) {
+            throw new Error('VueGridLayout: ' + contextName + '[' + i + '].i must be unique!');
+        }
+        keys.push(item.i);
+    }
+}
+
+export function cloneLayout(layout: Layout) {
+    return _.cloneDeep(layout)
+}
+
+
+export function bottom(layout: Layout) {
+    let max = 0, bottomY = 0;
+    for (const item of layout) {
+        bottomY = item.y + item.h;
+        max = Math.max(max, bottomY)
     }
     return max;
 }
 
-export function cloneLayout(layout: Layout): Layout {
-    const newLayout = Array(layout.length);
-    for (let i = 0, len = layout.length; i < len; i++) {
-        newLayout[i] = cloneLayoutItem(layout[i]);
-    }
-    return newLayout;
+export function getLayoutItem(layout: Layout, id: string | number | symbol) {
+    return layout.find(item => item.i === id)
 }
 
-
-export function cloneLayoutItem(layoutItem: IGridItem): IGridItem {
-    return JSON.parse(JSON.stringify(layoutItem));
+export function getStatics(layout: Layout) {
+    return layout.filter((l) => l.static);
 }
 
-
-export function collides(l1: IGridItem, l2: IGridItem): boolean {
-    if (l1 === l2) return false;
-    if (l1.x + l1.w <= l2.x) return false;
-    if (l1.x >= l2.x + l2.w) return false;
-    if (l1.y + l1.h <= l2.y) return false;
-    if (l1.y >= l2.y + l2.h) return false;
-    return true;
-}
-
-export function compact(layout: Layout, verticalCompact: boolean, minPositions?: any): Layout {
-    const compareWith = getStatics(layout);
-    const sorted = sortLayoutItemsByRowCol(layout);
-    const out = Array(layout.length);
-    for (let i = 0, len = sorted.length; i < len; i++) {
-        let l = sorted[i];
-        if (!l.static) {
-            l = compactItem(compareWith, l, verticalCompact, minPositions);
-            compareWith.push(l);
+export function sortLayoutItemsByRowCol(layout: Layout) {
+    return new Array<IGridItem>().concat(layout).sort(function (a, b) {
+        if (a.y === b.y && a.x === b.x) {
+            return 0;
         }
-        out[layout.indexOf(l)] = l;
-        l.moved = false;
-    }
-    return out;
+        if (a.y > b.y || (a.y === b.y && a.x > b.x)) {
+            return 1;
+        }
+        return -1;
+    });
 }
+
+export function collides(l1: IGridItem, l2: IGridItem) {
+    return !((l1 === l2) || (l1.x + l1.w <= l2.x) || (l1.x >= l2.x + l2.w) || (l1.y + l1.h <= l2.y) || (l1.y >= l2.y + l2.h));
+}
+
+export function getAllCollisions(layout: Layout, layoutItem: IGridItem) {
+    return layout.filter((l) => collides(l, layoutItem));
+}
+
+export function getFirstCollision(layout: Layout, layoutItem: IGridItem) {
+    return layout.find(item => collides(item, layoutItem))
+}
+
 
 export function compactItem(compareWith: Layout, l: IGridItem, verticalCompact: boolean, minPositions: any): IGridItem {
     if (verticalCompact) {
@@ -246,50 +182,56 @@ export function compactItem(compareWith: Layout, l: IGridItem, verticalCompact: 
     return l;
 }
 
-export function correctBounds(layout: Layout, bounds: {
-    cols: number
-}): Layout {
-    const collidesWith = getStatics(layout);
-    for (let i = 0, len = layout.length; i < len; i++) {
-        const l = layout[i];
-        if (l.x + l.w > bounds.cols) l.x = bounds.cols - l.w;
-        if (l.x < 0) {
-            l.x = 0;
-            l.w = bounds.cols;
+export function compact(layout: Layout, verticalCompact: boolean, minPositions?: { [key: number]: Point }) {
+    const compareWith = getStatics(layout);
+    const sorted = sortLayoutItemsByRowCol(layout);
+    const out = Array<IGridItem>(layout.length);
+    for (let i = 0, len = sorted.length; i < len; i++) {
+        let l = sorted[i];
+        if (!l.static) {
+            l = compactItem(compareWith, l, verticalCompact, minPositions);
+            compareWith.push(l);
         }
-        if (!l.static) collidesWith.push(l);
-        else {
-            while (getFirstCollision(collidesWith, l)) {
-                l.y++;
-            }
+        out[layout.indexOf(l)] = l;
+        l.moved = false;
+    }
+    return out;
+}
+
+export function getControlPosition(evt: Interact.ResizeEvent | Interact.DragEvent) {
+    const offsetParent = (<HTMLElement>evt.target).offsetParent || document.body;
+    const offsetParentRect = (<HTMLElement>evt.target).offsetParent === document.body ? {
+        left: 0,
+        top: 0
+    } : offsetParent.getBoundingClientRect();
+    const x = evt.clientX + offsetParent.scrollLeft - offsetParentRect.left;
+    const y = evt.clientY + offsetParent.scrollTop - offsetParentRect.top;
+    return {x, y};
+}
+
+//---
+
+export function moveElementAwayFromCollision(layout: Layout, collidesWith: IGridItem, itemToMove: IGridItem, isUserAction: boolean): Layout {
+    const preventCollision = false
+    if (isUserAction) {
+        const fakeItem: IGridItem = {
+            x: itemToMove.x,
+            y: itemToMove.y,
+            w: itemToMove.w,
+            h: itemToMove.h,
+            i: '-1'
+        };
+        fakeItem.y = Math.max(collidesWith.y - itemToMove.h, 0);
+        if (!getFirstCollision(layout, fakeItem)) {
+            return moveElement(layout, itemToMove, true, undefined, fakeItem.y, preventCollision);
         }
     }
-    return layout;
+    return moveElement(layout, itemToMove, true, undefined, itemToMove.y + 1, preventCollision);
 }
 
-
-export function getLayoutItem(layout: Layout, id?: string): IGridItem | undefined {
-    for (let i = 0, len = layout.length; i < len; i++) {
-        if (layout[i].i === id) return layout[i];
-    }
-}
-
-export function getFirstCollision(layout: Layout, layoutItem: IGridItem): IGridItem | void {
-    for (let i = 0, len = layout.length; i < len; i++) {
-        if (collides(layout[i], layoutItem)) return layout[i];
-    }
-}
-
-export function getAllCollisions(layout: Layout, layoutItem: IGridItem): Array<IGridItem> {
-    return layout.filter((l) => collides(l, layoutItem));
-}
-
-export function getStatics(layout: Layout): Array<IGridItem> {
-    return layout.filter((l) => l.static);
-}
-
-export function moveElement(layout: Layout, l: IGridItem, x: number | undefined, y: number | undefined, isUserAction: boolean, preventCollision?: boolean): Layout {
+export function moveElement(layout: Layout, l: IGridItem, isUserAction: boolean, x?: number, y?: number, preventCollision?: boolean): Layout {
     if (l.static) return layout;
+
     const oldX = l.x;
     const oldY = l.y;
 
@@ -324,179 +266,3 @@ export function moveElement(layout: Layout, l: IGridItem, x: number | undefined,
     return layout;
 }
 
-
-export function moveElementAwayFromCollision(layout: Layout, collidesWith: IGridItem,
-                                             itemToMove: IGridItem, isUserAction: boolean): Layout {
-
-    const preventCollision = false
-    if (isUserAction) {
-        const fakeItem: IGridItem = {
-            x: itemToMove.x,
-            y: itemToMove.y,
-            w: itemToMove.w,
-            h: itemToMove.h,
-            i: '-1'
-        };
-        fakeItem.y = Math.max(collidesWith.y - itemToMove.h, 0);
-        if (!getFirstCollision(layout, fakeItem)) {
-            return moveElement(layout, itemToMove, undefined, fakeItem.y, preventCollision);
-        }
-    }
-
-    return moveElement(layout, itemToMove, undefined, itemToMove.y + 1, preventCollision);
-}
-
-export function percentage(num: number): string {
-    return num * 100 + '%';
-}
-
-
-export function sortLayoutItemsByRowCol(layout: Layout): Layout {
-    return ([] as any).concat(layout).sort(function (a, b) {
-        if (a.y === b.y && a.x === b.x) {
-            return 0;
-        }
-
-        if (a.y > b.y || (a.y === b.y && a.x > b.x)) {
-            return 1;
-        }
-        return -1;
-    });
-}
-
-export function validateLayout(layout: Layout, contextName?: string): void {
-    contextName = contextName || "Layout";
-    const subProps = ['x', 'y', 'w', 'h'];
-    let keyArr = [];
-    if (!Array.isArray(layout)) throw new Error(contextName + " must be an array!");
-    for (let i = 0, len = layout.length; i < len; i++) {
-        const item = layout[i];
-        for (let j = 0; j < subProps.length; j++) {
-            const t = subProps[j] as 'x' | 'y' | 'w' | 'h'
-            if (typeof item[t] !== 'number') {
-                throw new Error('VueGridLayout: ' + contextName + '[' + i + '].' + subProps[j] + ' must be a number!');
-            }
-        }
-
-        if (item.i === undefined || item.i === null) {
-            throw new Error('VueGridLayout: ' + contextName + '[' + i + '].i cannot be null!');
-        }
-
-        if (keyArr.indexOf(item.i) >= 0) {
-            throw new Error('VueGridLayout: ' + contextName + '[' + i + '].i must be unique!');
-        }
-        keyArr.push(item.i);
-
-        if (item.static !== undefined && typeof item.static !== 'boolean') {
-            throw new Error('VueGridLayout: ' + contextName + '[' + i + '].static must be a boolean!');
-        }
-    }
-}
-
-
-export function createMarkup(obj: IObject) {
-    let keys = Object.keys(obj);
-    if (!keys.length) return '';
-    let i, len = keys.length;
-    let result = '';
-
-    for (i = 0; i < len; i++) {
-        let key = keys[i];
-        let val = obj[key];
-        result += hyphenate(key) + ':' + addPx(key as any, val) + ';';
-    }
-
-    return result;
-}
-
-
-export const IS_UNITLESS = {
-    animationIterationCount: true,
-    boxFlex: true,
-    boxFlexGroup: true,
-    boxOrdinalGroup: true,
-    columnCount: true,
-    flex: true,
-    flexGrow: true,
-    flexPositive: true,
-    flexShrink: true,
-    flexNegative: true,
-    flexOrder: true,
-    gridRow: true,
-    gridColumn: true,
-    fontWeight: true,
-    lineClamp: true,
-    lineHeight: true,
-    opacity: true,
-    order: true,
-    orphans: true,
-    tabSize: true,
-    widows: true,
-    zIndex: true,
-    zoom: true,
-    fillOpacity: true,
-    stopOpacity: true,
-    strokeDashoffset: true,
-    strokeOpacity: true,
-    strokeWidth: true
-};
-
-export function addPx(name: keyof typeof IS_UNITLESS, value: unknown) {
-    if (typeof value === 'number' && !IS_UNITLESS[name]) {
-        return `${value}px`;
-    } else {
-        return value;
-    }
-}
-
-export let hyphenateRE = /([a-z\d])([A-Z])/g;
-
-export function hyphenate(str: string) {
-    return str.replace(hyphenateRE, '$1-$2').toLowerCase();
-}
-
-
-export function findItemInArray(array: Array<IGridItem>, property: keyof IGridItem, value: any) {
-    for (let i = 0; i < array.length; i++)
-        if (array[i][property] == value)
-            return true;
-    return false;
-}
-
-export function findAndRemove(array: Array<IGridItem>, property: keyof IGridItem, value: any) {
-    array.forEach(function (result, index) {
-        if (result[property] === value) {
-            array.splice(index, 1);
-        }
-    });
-}
-
-export const findDifference = (layout: Layout, originalLayout: Layout) => {
-    let uniqueResultOne = layout.filter(function (obj) {
-        return !originalLayout.some(function (obj2) {
-            return obj.i === obj2.i;
-        });
-    });
-
-    let uniqueResultTwo = originalLayout.filter(function (obj) {
-        return !layout.some(function (obj2) {
-            return obj.i === obj2.i;
-        });
-    });
-    return uniqueResultOne.concat(uniqueResultTwo);
-}
-
-
-export const isAndroid = () => {
-    return navigator.userAgent.toLowerCase().indexOf("android") !== -1;
-}
-
-export const clamp = (num: number, lowerBound: number, upperBound: number) => {
-    return Math.max(Math.min(num, upperBound), lowerBound);
-}
-export const calcGridItemWHPx = (gridUnits: number, colOrRowSize: number, marginPx: number) => {
-    if (!Number.isFinite(gridUnits)) return gridUnits;
-    return Math.round(
-        colOrRowSize * gridUnits + Math.max(0, gridUnits - 1) * marginPx
-    );
-}

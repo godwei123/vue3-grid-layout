@@ -11,21 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import {IGridLayout, ItemPropsType, ItemState, LayoutState, Position} from "../types";
+import {IGridLayout, ItemPropsType, ItemState, LayoutState, Position, PositionLeft, PositionRight} from "../types";
 import {computed, CSSProperties, inject, onBeforeUnmount, onMounted, reactive, ref, unref, watch} from "vue";
-import {
-  calcGridItemWHPx,
-  clamp,
-  createCoreData,
-  emitter,
-  getColsFromBreakpoint,
-  getControlPosition,
-  getDocumentDir,
-  setTopLeft,
-  setTopRight,
-  setTransform,
-  setTransformRtl
-} from "../utils/helpers.js";
+import {calcGridItemWHPx, clamp, createCoreData, getColsFromBreakpoint, getDocumentDir} from "../utils/helpers.js";
 import interact from '@interactjs/interact';
 import '@interactjs/auto-start';
 import '@interactjs/auto-scroll';
@@ -37,6 +25,8 @@ import {DraggableOptions} from '@interactjs/actions/drag/plugin';
 import {Interactable} from "@interactjs/core/Interactable";
 import Interact from "@interactjs/types/index";
 import {ResizableOptions} from "@interactjs/actions/resize/plugin";
+import emitter from "../utils/mitt.ts";
+import {getControlPosition, setTopLeft, setTopRight, setTransform, setTransformRtl} from '../utils'
 
 const props = withDefaults(defineProps<ItemPropsType>(), {
   static: false,
@@ -216,7 +206,7 @@ const calcPosition = (x: number, y: number, w: number, h: number): Position => {
     width: w === Infinity ? w : Math.round(colWidth * w + Math.max(0, w - 1) * state.margin[0]),
     height: h === Infinity ? h : Math.round(state.rowHeight * h + Math.max(0, h - 1) * state.margin[1])
   }
-  return result
+  return renderRtl.value ? result as PositionRight : result as PositionLeft
 }
 
 const createStyle = () => {
@@ -228,12 +218,13 @@ const createStyle = () => {
     state.innerW = props.w;
   }
   const pos = calcPosition(state.innerX, state.innerY, state.innerW, state.innerH);
+
   if (state.isDragging) {
     pos.top = state.dragging?.top;
     if (renderRtl.value) {
-      pos.right = state.dragging?.left;
+      (pos as PositionRight).right = state.dragging?.left;
     } else {
-      pos.left = state.dragging?.left;
+      (pos as PositionLeft).left = state.dragging?.left;
     }
   }
   if (state.isResizing) {
@@ -243,15 +234,15 @@ const createStyle = () => {
   let style: CSSProperties
   if (state.useCssTransforms) {
     if (renderRtl.value) {
-      style = setTransformRtl(pos.top, pos.right || 0, pos.width, pos.height);
+      style = setTransformRtl(pos.top, (pos as PositionRight).right || 0, pos.width, pos.height);
     } else {
-      style = setTransform(pos.top, pos.left || 0, pos.width, pos.height);
+      style = setTransform(pos.top, (pos as PositionLeft).left || 0, pos.width, pos.height);
     }
   } else {
     if (renderRtl.value) {
-      style = setTopRight(pos.top, pos.right || 0, pos.width, pos.height);
+      style = setTopRight(pos.top, (pos as PositionRight).right || 0, pos.width, pos.height);
     } else {
-      style = setTopLeft(pos.top, pos.left || 0, pos.width, pos.height);
+      style = setTopLeft(pos.top, (pos as PositionLeft).left || 0, pos.width, pos.height);
     }
   }
   state.style = style
@@ -299,8 +290,8 @@ const handleResize = (event: Interact.ResizeEvent) => {
       state.previousW = state.innerW;
       state.previousH = state.innerH;
       pos = calcPosition(state.innerX, state.innerY, state.innerW, state.innerH);
-      newSize.width = pos.width;
-      newSize.height = pos.height;
+      newSize.width = pos.width || 0;
+      newSize.height = pos.height || 0;
       state.resizing = newSize;
       state.isResizing = true;
       break;
@@ -319,8 +310,8 @@ const handleResize = (event: Interact.ResizeEvent) => {
     }
     case "resizeend": {
       pos = calcPosition(state.innerX, state.innerY, state.innerW, state.innerH);
-      newSize.width = pos.width;
-      newSize.height = pos.height;
+      newSize.width = pos.width || 0;
+      newSize.height = pos.height || 0;
       state.resizing = null;
       state.isResizing = false;
       break;
@@ -340,9 +331,7 @@ const handleResize = (event: Interact.ResizeEvent) => {
   if (event.type === 'resizeend' && (state.previousW !== state.innerW || state.previousH !== state.innerH)) {
     emit('resized', props.i, pos.h, pos.w, newSize.height, newSize.width);
   }
-  emitter.emit('resizeEvent', [
-    event.type, props.i, state.innerX, state.innerY, pos.h, pos.w,
-  ]);
+  emitter.emit('resizeEvent', [event.type, props.i, state.innerX, state.innerY, pos.h, pos.w]);
 }
 
 const handleDrag = (event: Interact.DragEvent) => {
@@ -359,7 +348,7 @@ const handleDrag = (event: Interact.DragEvent) => {
       state.previousX = state.innerX;
       state.previousY = state.innerY;
 
-      const parentRect = event.target.offsetParent.getBoundingClientRect();
+      const parentRect = (event.target as HTMLElement).offsetParent!.getBoundingClientRect();
       const clientRect = event.target.getBoundingClientRect();
 
       const cLeft = clientRect.left / state.transformScale;
@@ -381,7 +370,7 @@ const handleDrag = (event: Interact.DragEvent) => {
     }
     case "dragend": {
       if (!state.isDragging) return;
-      const parentRect = event.target.offsetParent.getBoundingClientRect();
+      const parentRect = (event.target as HTMLElement).offsetParent!.getBoundingClientRect();
       const clientRect = event.target.getBoundingClientRect();
 
       const cLeft = clientRect.left / state.transformScale;
@@ -409,7 +398,7 @@ const handleDrag = (event: Interact.DragEvent) => {
       }
       newPosition.top = state.dragging?.top + coreEvent.deltaY / state.transformScale;
       if (state.bounded) {
-        const bottomBoundary = event.target.offsetParent.clientHeight - calcGridItemWHPx(props.h, state.rowHeight, state.margin[1]);
+        const bottomBoundary = (event.target as HTMLElement).offsetParent!.clientHeight - calcGridItemWHPx(props.h, state.rowHeight, state.margin[1]);
         newPosition.top = clamp(newPosition.top, 0, bottomBoundary);
         const colWidth = calcColWidth();
         const rightBoundary = state.containerWidth - calcGridItemWHPx(props.w, colWidth, state.margin[0]);
@@ -489,12 +478,12 @@ const tryMakeResizable = () => {
     opts.modifiers = [
       interact.modifiers.restrictSize({
         min: {
-          height: minimum.height * state.transformScale,
-          width: minimum.width * state.transformScale
+          height: minimum.height! * state.transformScale,
+          width: minimum.width! * state.transformScale
         },
         max: {
-          height: maximum.height * state.transformScale,
-          width: maximum.width * state.transformScale
+          height: maximum.height! * state.transformScale,
+          width: maximum.width! * state.transformScale
         }
       },)]
 
@@ -505,12 +494,12 @@ const tryMakeResizable = () => {
         }),
         interact.modifiers.restrictSize({
           min: {
-            height: minimum.height * state.transformScale,
-            width: minimum.width * state.transformScale
+            height: minimum.height! * state.transformScale,
+            width: minimum.width! * state.transformScale
           },
           max: {
-            height: maximum.height * state.transformScale,
-            width: maximum.width * state.transformScale
+            height: maximum.height! * state.transformScale,
+            width: maximum.width! * state.transformScale
           }
         },)
       ]
@@ -580,11 +569,11 @@ watch(renderRtl, () => {
   createStyle();
 })
 
-watch(() => layout.margin, (value) => {
+watch(() => layout.margin, (value: [number, number]) => {
   if (!value || (Number(value[0]) === Number(state.margin[0]) && Number(value[1]) === Number(state.margin[1]))) {
     return
   }
-  state.margin = value.map(v => Number(v))
+  state.margin = [Number(value[0]), Number(value[1])]
   createStyle()
   emitContainerResized()
 })

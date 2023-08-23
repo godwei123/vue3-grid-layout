@@ -17,23 +17,25 @@
 import {nextTick, onBeforeMount, onBeforeUnmount, onMounted, provide, reactive, ref, toRefs, watch,} from "vue";
 import GridItem from "./GridItem.vue";
 import elementResizeDetectorMaker, {Erd} from "element-resize-detector"
-import {IGridLayout, Layout, LayoutState} from "../types";
+import {IGridLayout, Layout, LayoutState, Point} from "../types";
+import {
+  findDifference,
+  findOrGenerateResponsiveLayout,
+  getBreakpointFromWidth,
+  getColsFromBreakpoint,
+} from "../utils/helpers";
+import emitter from "../utils/mitt.ts";
 import {
   addWindowEventListener,
   bottom,
   cloneLayout,
   compact,
-  emitter,
-  findDifference,
-  findOrGenerateResponsiveLayout,
   getAllCollisions,
-  getBreakpointFromWidth,
-  getColsFromBreakpoint,
   getLayoutItem,
   moveElement,
   removeWindowEventListener,
-  validateLayout
-} from "../utils/helpers";
+  validateLayout,
+} from '../utils'
 
 const props = withDefaults(defineProps<IGridLayout>(), {
   autoSize: true,
@@ -67,11 +69,11 @@ const emit = defineEmits<{
 }>()
 
 let erd: Erd;
-let positionsBeforeDrag: any;
+let positionsBeforeDrag: { [key: number]: Point };
 let layoutRef = ref<HTMLElement | null>(null)
 
 const state = reactive<LayoutState>({
-  width: null,
+  width: 0,
   mergeStyles: {},
   lastLayoutLength: 0,
   isDragging: false,
@@ -114,7 +116,7 @@ const updateHeight = () => {
 
 
 const responsiveGridLayout = () => {
-  const newBreakpoint = getBreakpointFromWidth(props.breakpoints, state.width);
+  const newBreakpoint = getBreakpointFromWidth(props.breakpoints, state.width!);
   if (!newBreakpoint) return
   const newCols = getColsFromBreakpoint(newBreakpoint, props.cols);
   if (state.lastBreakpoint != null && !state.layouts[state.lastBreakpoint])
@@ -193,7 +195,7 @@ watch(() => props.responsive, () => {
 watch(() => props.maxRows, () => emitter.emit('setMaxRows', props.maxRows))
 watch(() => props.margin, () => updateHeight())
 
-const resizeEventHandler = (params: [string, string, number, number, number, number] | undefined) => {
+const resizeEventHandler = (params: [string, (string | number | symbol), number, number, number, number] | undefined) => {
   if (params === undefined) return
   const [eventName, id, x, y, h, w] = params
   let l: any;
@@ -256,7 +258,9 @@ const resizeEventHandler = (params: [string, string, number, number, number, num
 }
 
 
-const dragEventHandler = ([eventName, id, x, y, h, w] = []) => {
+const dragEventHandler = (params: [string, (string | number | symbol), number, number, number, number]) => {
+  if (params === undefined) return
+  const [eventName, id, x, y, h, w] = params
   let l;
   l = getLayoutItem(props.layout, id)
   if (l === undefined || l === null) {
@@ -266,7 +270,7 @@ const dragEventHandler = ([eventName, id, x, y, h, w] = []) => {
     positionsBeforeDrag = props.layout.reduce((result, {i, x, y}) => ({
       ...result,
       [i]: {x, y}
-    }), {});
+    }), {})
   }
 
   if (eventName === "dragmove" || eventName === "dragstart") {
@@ -284,7 +288,7 @@ const dragEventHandler = ([eventName, id, x, y, h, w] = []) => {
       state.isDragging = false;
     });
   }
-  const newLayout = moveElement(props.layout, l, x, y, true, props.preventCollision);
+  const newLayout = moveElement(props.layout, l, true, props.preventCollision, x, y);
   emit('update:layout', newLayout)
   if (props.restoreOnDrag) {
     l.static = true;
@@ -298,7 +302,7 @@ const dragEventHandler = ([eventName, id, x, y, h, w] = []) => {
   emitter.emit("compact");
   updateHeight();
   if (eventName === 'dragend') {
-    positionsBeforeDrag = null;
+    positionsBeforeDrag = {};
     emit('layout-updated', newLayout);
     emit('update:layout', newLayout);
   }

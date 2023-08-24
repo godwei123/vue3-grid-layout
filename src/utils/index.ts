@@ -461,8 +461,8 @@ export function correctBounds(
 export function createMarkup(obj: IObject) {
   const keys = Object.keys(obj)
   if (!keys.length) return ''
-  let i,
-    len = keys.length
+  let i
+  const len = keys.length
   let result = ''
 
   for (i = 0; i < len; i++) {

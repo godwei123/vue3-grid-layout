@@ -1,8 +1,8 @@
 <script setup>
 import {onMounted, reactive,} from 'vue';
-import GridItem from './components/GridItem.vue';
-import GridLayout from './components/GridLayout.vue';
-import {getDocumentDir, setDocumentDir} from './utils/helpers';
+import GridItem from '../components/GridItem.vue';
+import GridLayout from '../components/GridLayout.vue';
+import {getDocumentDir, setDocumentDir} from '../utils';
 
 const testLayout = [
   {x: 0, y: 0, w: 2, h: 2, i: '0', resizable: true, draggable: true, static: false, minY: 0, maxY: 2},
@@ -153,7 +153,7 @@ function containerResized(i, newH, newW, newHPx, newWPx) {
  */
 function changeDirection() {
   const documentDirection = getDocumentDir();
-  let toggle = '';
+  let toggle;
   if (documentDirection === 'rtl') {
     toggle = 'ltr';
   } else {

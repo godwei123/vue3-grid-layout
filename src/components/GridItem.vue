@@ -11,9 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import {IGridLayout, ItemPropsType, ItemState, LayoutState, Position, PositionLeft, PositionRight} from "../types";
+import {ItemPropsType, ItemState, Position, PositionLeft, PositionRight} from "../types";
 import {computed, CSSProperties, inject, onBeforeUnmount, onMounted, reactive, ref, unref, watch} from "vue";
-import {calcGridItemWHPx, clamp, createCoreData, getColsFromBreakpoint, getDocumentDir} from "../utils/helpers.js";
 import interact from '@interactjs/interact';
 import '@interactjs/auto-start';
 import '@interactjs/auto-scroll';
@@ -26,7 +25,18 @@ import {Interactable} from "@interactjs/core/Interactable";
 import Interact from "@interactjs/types/index";
 import {ResizableOptions} from "@interactjs/actions/resize/plugin";
 import emitter from "../utils/mitt.ts";
-import {getControlPosition, setTopLeft, setTopRight, setTransform, setTransformRtl} from '../utils'
+import {
+  calcGridItemWHPx,
+  clamp,
+  createCoreData,
+  getColsFromBreakpoint,
+  getControlPosition,
+  getDocumentDir,
+  setTopLeft,
+  setTopRight,
+  setTransform,
+  setTransformRtl
+} from '../utils'
 
 const props = withDefaults(defineProps<ItemPropsType>(), {
   static: false,
@@ -46,7 +56,7 @@ const props = withDefaults(defineProps<ItemPropsType>(), {
 const emit = defineEmits(['move', 'resize', 'moved', 'resized', 'containerResized'])
 const itemRef = ref<HTMLElement | null>()
 let instance: Interactable;
-const layout = inject<Required<Omit<LayoutState & IGridLayout, 'layout'>>>('layout', {})
+const layout = inject<any>('layout', {})
 
 
 const state = reactive<ItemState>({
@@ -181,7 +191,7 @@ const calcXY = (top: number, left: number) => {
 const calcWH = (height: number, width: number, autoSizeFlag = false) => {
   const colWidth = calcColWidth()
   let w = Math.round((width + state.margin[0]) / (colWidth + state.margin[0]));
-  let h = 0;
+  let h: number;
   if (!autoSizeFlag) {
     h = Math.round((height + state.margin[1]) / (state.rowHeight + state.margin[1]));
   } else {
@@ -279,7 +289,6 @@ const updateWidth = (width: number, colNum?: number) => {
 const handleResize = (event: Interact.ResizeEvent) => {
   if (props.static) return;
   const position = getControlPosition(event);
-  if (position === null) return;
   const {x, y} = position;
 
   const newSize = {width: 0, height: 0};

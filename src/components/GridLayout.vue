@@ -4,11 +4,11 @@
     <grid-item
         class="vue3-grid-placeholder"
         v-show="isDragging"
-        :x="placeholder!.x"
-        :y="placeholder!.y"
-        :w="placeholder!.w"
-        :h="placeholder!.h"
-        :i="placeholder!.i"
+        :x="placeholder.x"
+        :y="placeholder.y"
+        :w="placeholder.w"
+        :h="placeholder.h"
+        :i="placeholder.i"
     ></grid-item>
   </div>
 </template>
@@ -17,27 +17,26 @@
 import {nextTick, onBeforeMount, onBeforeUnmount, onMounted, provide, reactive, ref, toRefs, watch,} from "vue";
 import GridItem from "./GridItem.vue";
 import elementResizeDetectorMaker, {Erd} from "element-resize-detector"
-import {IGridItem, IGridLayout, Layout, LayoutState, Point} from "../types";
-import {
-  findDifference,
-  findOrGenerateResponsiveLayout,
-  getBreakpointFromWidth,
-  getColsFromBreakpoint,
-} from "../utils/helpers";
+import {IGridItem, Layout, LayoutPropType, LayoutState, Point, ResponsiveLayout} from "../types";
 import emitter from "../utils/mitt.ts";
 import {
   addWindowEventListener,
   bottom,
   cloneLayout,
   compact,
+  findDifference,
+  findOrGenerateResponsiveLayout,
   getAllCollisions,
+  getBreakpointFromWidth,
+  getColsFromBreakpoint,
   getLayoutItem,
   moveElement,
   removeWindowEventListener,
-  validateLayout,
+  validateLayout
 } from '../utils'
+import _ from "lodash";
 
-const props = withDefaults(defineProps<IGridLayout>(), {
+const props = withDefaults(defineProps<LayoutPropType>(), {
   autoSize: true,
   colNum: 12,
   rowHeight: 150,
@@ -84,24 +83,24 @@ const state = reactive<LayoutState>({
     h: 0,
     i: -1,
   },
-  layouts: {},
+  layouts: {} as ResponsiveLayout,
   lastBreakpoint: null,
   originalLayout: null,
 })
 
 
-provide<Omit<LayoutState & IGridLayout, 'layout'>, string>('layout', {...props, ...state})
+provide('layout', {...props, ...state})
 
 
 const onWindowResize = () => {
   if (layoutRef.value) {
-    state.width = layoutRef.value.offsetWidth;
+    state.width = (layoutRef.value as HTMLElement).offsetWidth;
   }
   emitter.emit('resizeEvent');
 }
 
 const initResponsiveFeatures = () => {
-  state.layouts = {...props.responsiveLayouts}
+  state.layouts = _.cloneDeep(props.responsiveLayouts)
 }
 
 const containerHeight = () => {
@@ -116,18 +115,17 @@ const updateHeight = () => {
 
 
 const responsiveGridLayout = () => {
-  const newBreakpoint = getBreakpointFromWidth(props.breakpoints, state.width!);
+  const newBreakpoint = getBreakpointFromWidth(props.breakpoints, state.width);
   if (!newBreakpoint) return
   const newCols = getColsFromBreakpoint(newBreakpoint, props.cols);
   if (state.lastBreakpoint != null && !state.layouts[state.lastBreakpoint])
     state.layouts[state.lastBreakpoint] = cloneLayout(props.layout);
 
   const layout = findOrGenerateResponsiveLayout(
-      state.originalLayout,
+      state.originalLayout as Layout,
       state.layouts,
       props.breakpoints,
       newBreakpoint,
-      state.lastBreakpoint,
       newCols,
       props.verticalCompact
   );
@@ -317,7 +315,7 @@ onMounted(async () => {
   emit('layout-mounted', props.layout)
   await nextTick()
   validateLayout(props.layout)
-  state.originalLayout = props.layout
+  state.originalLayout = props.layout as Layout
   await nextTick()
   initResponsiveFeatures()
   onWindowResize()

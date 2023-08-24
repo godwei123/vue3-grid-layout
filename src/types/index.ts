@@ -43,15 +43,14 @@ export type LayoutItemRequired = {
 };
 export type Layout = Array<IGridItem>;
 export type IObject = Record<string, any>
-export type ResponsiveLayout = Partial<Record<ISize, Layout>>
-export type PartialRecordSize = Partial<Record<ISize, number>>
+export type ResponsiveLayout = Record<ISize, Layout>
 
-export type Breakpoints = PartialRecordSize
+export type Breakpoints = Record<ISize, number>
 export type Breakpoint = keyof Breakpoints;
-export type Cols = PartialRecordSize
+export type Cols = Record<ISize, number>
 
 
-export type ItemPropsType = IGridItem & {
+export interface ItemPropsType extends IGridItem {
     margin?: [number, number]
 }
 
@@ -80,10 +79,10 @@ export interface IGridItem extends LayoutItemRequired {
     moved?: boolean
 }
 
-export interface IGridLayout {
+export interface LayoutPropType {
     style?: CSSProperties,
     layout: Array<IGridItem>,
-    responsiveLayouts?: ResponsiveLayout,
+    responsiveLayouts?: ResponsiveLayout | {},
     colNum?: number,
     rowHeight?: number,
     maxRows?: number,
@@ -111,7 +110,7 @@ export interface LayoutState {
     lastLayoutLength: number,
     isDragging: boolean,
     placeholder: IGridItem,
-    layouts: IObject,
+    layouts: ResponsiveLayout,
     lastBreakpoint: null | Breakpoint,
     originalLayout: null | Layout,
 }

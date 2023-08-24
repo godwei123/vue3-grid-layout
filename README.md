@@ -1,4 +1,9 @@
 # Vue 3 + TypeScript + Vite
 
-bug - 重叠问题 √
-bug - static 缩放重叠
+bug
+
+- 计算重叠问题
+- 拖放重叠问题
+- CI/CD问题
+- eslint配置
+

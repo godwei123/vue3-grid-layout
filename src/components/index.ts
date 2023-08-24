@@ -1,13 +1,13 @@
-import { App } from 'vue';
+import { App } from 'vue'
 
-import GridItem from './GridItem.vue';
-import GridLayout from './GridLayout.vue';
+import GridItem from './GridItem.vue'
+import GridLayout from './GridLayout.vue'
 
-export { GridLayout, GridItem };
+export { GridLayout, GridItem }
 
 const install = (app: App) => {
-    app.component('grid-layout', GridLayout)
-    app.component('grid-item', GridItem)
+  app.component('grid-layout', GridLayout)
+  app.component('grid-item', GridItem)
 }
 
-export default install;
+export default install

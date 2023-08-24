@@ -1,8 +1,6 @@
-<script setup>
-
-</script>
+<script setup></script>
 <template>
-  <router-view/>
+  <router-view />
 </template>
 
 <style lang="css">
@@ -46,7 +44,6 @@
   -webkit-columns: 120px;
   columns: 120px;
 }
-
 
 .vue3-resizable-handle {
   z-index: 5000;
@@ -109,7 +106,8 @@
   height: 20px;
   top: 0;
   left: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
+    no-repeat;
   background-position: bottom right;
   padding: 0 8px 8px 0;
   background-repeat: no-repeat;
@@ -121,5 +119,4 @@
 #content .vue3-grid-item.vue3-grid-placeholder {
   background-color: green;
 }
-
 </style>

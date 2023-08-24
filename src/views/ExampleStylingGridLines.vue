@@ -1,23 +1,24 @@
 <template>
   <div class="container">
     <grid-layout
-        class="grid"
-        :layout.sync="layout"
-        :margin="margin"
-        :col-num="colNum"
-        :row-height="rowHeight"
-        :is-draggable="draggable"
-        :is-resizable="resizable"
-        :vertical-compact="true"
-        :use-css-transforms="true"
+      class="grid"
+      :layout.sync="layout"
+      :margin="margin"
+      :col-num="colNum"
+      :row-height="rowHeight"
+      :is-draggable="draggable"
+      :is-resizable="resizable"
+      :vertical-compact="true"
+      :use-css-transforms="true"
     >
-      <grid-item v-for="item in layout"
-                 :static="item.static"
-                 :x="item.x"
-                 :y="item.y"
-                 :w="item.w"
-                 :h="item.h"
-                 :i="item.i"
+      <grid-item
+        v-for="item in layout"
+        :static="item.static"
+        :x="item.x"
+        :y="item.y"
+        :w="item.w"
+        :h="item.h"
+        :i="item.i"
       >
         <span class="text">{{ itemTitle(item) }}</span>
       </grid-item>
@@ -26,8 +27,7 @@
 </template>
 
 <script>
-import {GridItem, GridLayout} from "../components";
-
+import { GridItem, GridLayout } from '../components'
 
 export default {
   components: {
@@ -37,26 +37,26 @@ export default {
   data() {
     return {
       layout: [
-        {"x": 0, "y": 0, "w": 2, "h": 2, "i": "0", static: false},
-        {"x": 2, "y": 0, "w": 2, "h": 4, "i": "1", static: true},
-        {"x": 4, "y": 0, "w": 2, "h": 5, "i": "2", static: false},
-        {"x": 6, "y": 0, "w": 2, "h": 3, "i": "3", static: false},
-        {"x": 8, "y": 0, "w": 2, "h": 3, "i": "4", static: false},
-        {"x": 10, "y": 0, "w": 2, "h": 3, "i": "5", static: false},
-        {"x": 0, "y": 5, "w": 2, "h": 5, "i": "6", static: false},
-        {"x": 2, "y": 5, "w": 2, "h": 5, "i": "7", static: false},
-        {"x": 4, "y": 5, "w": 2, "h": 5, "i": "8", static: false},
-        {"x": 6, "y": 3, "w": 2, "h": 4, "i": "9", static: true},
-        {"x": 8, "y": 4, "w": 2, "h": 4, "i": "10", static: false},
-        {"x": 10, "y": 4, "w": 2, "h": 4, "i": "11", static: false},
-        {"x": 0, "y": 10, "w": 2, "h": 5, "i": "12", static: false},
-        {"x": 2, "y": 10, "w": 2, "h": 5, "i": "13", static: false},
-        {"x": 4, "y": 8, "w": 2, "h": 4, "i": "14", static: false},
-        {"x": 6, "y": 8, "w": 2, "h": 4, "i": "15", static: false},
-        {"x": 8, "y": 10, "w": 2, "h": 5, "i": "16", static: false},
-        {"x": 10, "y": 4, "w": 2, "h": 2, "i": "17", static: false},
-        {"x": 0, "y": 9, "w": 2, "h": 3, "i": "18", static: false},
-        {"x": 2, "y": 6, "w": 2, "h": 2, "i": "19", static: false}
+        { x: 0, y: 0, w: 2, h: 2, i: '0', static: false },
+        { x: 2, y: 0, w: 2, h: 4, i: '1', static: true },
+        { x: 4, y: 0, w: 2, h: 5, i: '2', static: false },
+        { x: 6, y: 0, w: 2, h: 3, i: '3', static: false },
+        { x: 8, y: 0, w: 2, h: 3, i: '4', static: false },
+        { x: 10, y: 0, w: 2, h: 3, i: '5', static: false },
+        { x: 0, y: 5, w: 2, h: 5, i: '6', static: false },
+        { x: 2, y: 5, w: 2, h: 5, i: '7', static: false },
+        { x: 4, y: 5, w: 2, h: 5, i: '8', static: false },
+        { x: 6, y: 3, w: 2, h: 4, i: '9', static: true },
+        { x: 8, y: 4, w: 2, h: 4, i: '10', static: false },
+        { x: 10, y: 4, w: 2, h: 4, i: '11', static: false },
+        { x: 0, y: 10, w: 2, h: 5, i: '12', static: false },
+        { x: 2, y: 10, w: 2, h: 5, i: '13', static: false },
+        { x: 4, y: 8, w: 2, h: 4, i: '14', static: false },
+        { x: 6, y: 8, w: 2, h: 4, i: '15', static: false },
+        { x: 8, y: 10, w: 2, h: 5, i: '16', static: false },
+        { x: 10, y: 4, w: 2, h: 2, i: '17', static: false },
+        { x: 0, y: 9, w: 2, h: 3, i: '18', static: false },
+        { x: 2, y: 6, w: 2, h: 2, i: '19', static: false }
       ],
       draggable: true,
       resizable: true,
@@ -77,27 +77,22 @@ export default {
   },
   methods: {
     itemTitle(item) {
-      let result = item.i;
+      let result = item.i
       if (item.static) {
-        result += " - Static";
+        result += ' - Static'
       }
-      return result;
+      return result
     }
   }
 }
 </script>
 
 <style>
-
 .grid::before {
   content: '';
   background-size: calc(calc(100% - 5px) / 12) 40px;
-  background-image: linear-gradient(
-      to right,
-      lightgrey 1px,
-      transparent 1px
-  ),
-  linear-gradient(to bottom, lightgrey 1px, transparent 1px);
+  background-image: linear-gradient(to right, lightgrey 1px, transparent 1px),
+    linear-gradient(to bottom, lightgrey 1px, transparent 1px);
   height: calc(100% - 5px);
   width: calc(100% - 5px);
   /*height: 100%;*/
@@ -156,7 +151,8 @@ export default {
   height: 20px;
   top: 0;
   left: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
+    no-repeat;
   background-position: bottom right;
   padding: 0 8px 8px 0;
   background-repeat: no-repeat;
@@ -164,6 +160,4 @@ export default {
   box-sizing: border-box;
   cursor: pointer;
 }
-
-
 </style>

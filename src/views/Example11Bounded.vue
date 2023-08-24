@@ -1,35 +1,38 @@
 <template>
-  <div style="width:100%;height:2000px;">
+  <div style="width: 100%; height: 2000px">
     <div class="layoutJSON">
       Displayed as <code>[x, y, w, h]</code>:
       <div class="columns">
         <div v-for="item in layout">
-          <b>{{ item.i }}</b>: [{{ item.x }}, {{ item.y }}, {{ item.w }}, {{ item.h }}]
+          <b>{{ item.i }}</b
+          >: [{{ item.x }}, {{ item.y }}, {{ item.w }}, {{ item.h }}]
         </div>
       </div>
     </div>
-    <hr/>
-    <input type="checkbox" v-model="draggable"/> Draggable
-    <input type="checkbox" v-model="resizable"/> Resizable
-    <input type="checkbox" v-model="bounded"/> Bounded
-    <br/>
-    <div style="width:100%;margin-top: 10px;height:100%;">
-      <grid-layout :layout.sync="layout"
-                   :col-num="12"
-                   :row-height="30"
-                   :is-draggable="draggable"
-                   :is-resizable="resizable"
-                   :is-bounded="bounded"
-                   :vertical-compact="true"
-                   :use-css-transforms="true"
+    <hr />
+    <input type="checkbox" v-model="draggable" /> Draggable
+    <input type="checkbox" v-model="resizable" /> Resizable
+    <input type="checkbox" v-model="bounded" /> Bounded
+    <br />
+    <div style="width: 100%; margin-top: 10px; height: 100%">
+      <grid-layout
+        :layout.sync="layout"
+        :col-num="12"
+        :row-height="30"
+        :is-draggable="draggable"
+        :is-resizable="resizable"
+        :is-bounded="bounded"
+        :vertical-compact="true"
+        :use-css-transforms="true"
       >
-        <grid-item v-for="item in layout"
-                   :static="item.static"
-                   :x="item.x"
-                   :y="item.y"
-                   :w="item.w"
-                   :h="item.h"
-                   :i="item.i"
+        <grid-item
+          v-for="item in layout"
+          :static="item.static"
+          :x="item.x"
+          :y="item.y"
+          :w="item.w"
+          :h="item.h"
+          :i="item.i"
         >
           <span class="text">{{ item.i }}</span>
         </grid-item>
@@ -39,7 +42,7 @@
 </template>
 
 <script>
-import {GridItem, GridLayout} from "../components";
+import { GridItem, GridLayout } from '../components'
 
 export default {
   components: {
@@ -49,26 +52,26 @@ export default {
   data() {
     return {
       layout: [
-        {"x": 0, "y": 0, "w": 2, "h": 2, "i": "0"},
-        {"x": 2, "y": 0, "w": 2, "h": 4, "i": "1"},
-        {"x": 4, "y": 0, "w": 2, "h": 5, "i": "2"},
-        {"x": 6, "y": 0, "w": 2, "h": 3, "i": "3"},
-        {"x": 8, "y": 0, "w": 2, "h": 3, "i": "4"},
-        {"x": 10, "y": 0, "w": 2, "h": 3, "i": "5"},
-        {"x": 0, "y": 5, "w": 2, "h": 5, "i": "6"},
-        {"x": 2, "y": 5, "w": 2, "h": 5, "i": "7"},
-        {"x": 4, "y": 5, "w": 2, "h": 5, "i": "8"},
-        {"x": 6, "y": 4, "w": 2, "h": 4, "i": "9"},
-        {"x": 8, "y": 4, "w": 2, "h": 4, "i": "10"},
-        {"x": 10, "y": 4, "w": 2, "h": 4, "i": "11"},
-        {"x": 0, "y": 10, "w": 2, "h": 5, "i": "12"},
-        {"x": 2, "y": 10, "w": 2, "h": 5, "i": "13"},
-        {"x": 4, "y": 8, "w": 2, "h": 4, "i": "14"},
-        {"x": 6, "y": 8, "w": 2, "h": 4, "i": "15"},
-        {"x": 8, "y": 10, "w": 2, "h": 5, "i": "16"},
-        {"x": 10, "y": 4, "w": 2, "h": 2, "i": "17"},
-        {"x": 0, "y": 9, "w": 2, "h": 3, "i": "18"},
-        {"x": 2, "y": 6, "w": 2, "h": 2, "i": "19"}
+        { x: 0, y: 0, w: 2, h: 2, i: '0' },
+        { x: 2, y: 0, w: 2, h: 4, i: '1' },
+        { x: 4, y: 0, w: 2, h: 5, i: '2' },
+        { x: 6, y: 0, w: 2, h: 3, i: '3' },
+        { x: 8, y: 0, w: 2, h: 3, i: '4' },
+        { x: 10, y: 0, w: 2, h: 3, i: '5' },
+        { x: 0, y: 5, w: 2, h: 5, i: '6' },
+        { x: 2, y: 5, w: 2, h: 5, i: '7' },
+        { x: 4, y: 5, w: 2, h: 5, i: '8' },
+        { x: 6, y: 4, w: 2, h: 4, i: '9' },
+        { x: 8, y: 4, w: 2, h: 4, i: '10' },
+        { x: 10, y: 4, w: 2, h: 4, i: '11' },
+        { x: 0, y: 10, w: 2, h: 5, i: '12' },
+        { x: 2, y: 10, w: 2, h: 5, i: '13' },
+        { x: 4, y: 8, w: 2, h: 4, i: '14' },
+        { x: 6, y: 8, w: 2, h: 4, i: '15' },
+        { x: 8, y: 10, w: 2, h: 5, i: '16' },
+        { x: 10, y: 4, w: 2, h: 2, i: '17' },
+        { x: 0, y: 9, w: 2, h: 3, i: '18' },
+        { x: 2, y: 6, w: 2, h: 2, i: '19' }
       ],
       draggable: true,
       resizable: true,
@@ -128,7 +131,8 @@ export default {
   height: 20px;
   top: 0;
   left: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
+    no-repeat;
   background-position: bottom right;
   padding: 0 8px 8px 0;
   background-repeat: no-repeat;
@@ -149,5 +153,4 @@ export default {
   -webkit-columns: 120px;
   columns: 120px;
 }
-
 </style>

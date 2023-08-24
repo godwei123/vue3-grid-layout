@@ -4,29 +4,32 @@
       Displayed as <code>[x, y, w, h]</code>:
       <div class="columns">
         <div class="layoutItem" v-for="item in layout" :key="item.i">
-          <b>{{ item.i }}</b>: [{{ item.x }}, {{ item.y }}, {{ item.w }}, {{ item.h }}]
+          <b>{{ item.i }}</b
+          >: [{{ item.x }}, {{ item.y }}, {{ item.w }}, {{ item.h }}]
         </div>
       </div>
     </div>
     <button @click="addItem">Add an item dynamically</button>
-    <input type="checkbox" v-model="draggable"/> Draggable
-    <input type="checkbox" v-model="resizable"/> Resizable
-    <grid-layout :layout.sync="layout"
-                 :col-num="colNum"
-                 :row-height="30"
-                 :is-draggable="draggable"
-                 :is-resizable="resizable"
-                 :vertical-compact="true"
-                 :use-css-transforms="true"
+    <input type="checkbox" v-model="draggable" /> Draggable
+    <input type="checkbox" v-model="resizable" /> Resizable
+    <grid-layout
+      :layout.sync="layout"
+      :col-num="colNum"
+      :row-height="30"
+      :is-draggable="draggable"
+      :is-resizable="resizable"
+      :vertical-compact="true"
+      :use-css-transforms="true"
     >
-      <grid-item v-for="item in layout"
-                 :static="item.static"
-                 :x="item.x"
-                 :y="item.y"
-                 :w="item.w"
-                 :h="item.h"
-                 :i="item.i"
-                 :key="item.i"
+      <grid-item
+        v-for="item in layout"
+        :static="item.static"
+        :x="item.x"
+        :y="item.y"
+        :w="item.w"
+        :h="item.h"
+        :i="item.i"
+        :key="item.i"
       >
         <span class="text">{{ item.i }}</span>
         <span class="remove" @click="removeItem(item.i)">x</span>
@@ -36,7 +39,7 @@
 </template>
 
 <script>
-import {GridItem, GridLayout} from "../components";
+import { GridItem, GridLayout } from '../components'
 
 export default {
   components: {
@@ -46,21 +49,21 @@ export default {
   data() {
     return {
       layout: [
-        {x: 0, y: 0, w: 2, h: 2, i: "0"},
-        {x: 2, y: 0, w: 2, h: 2, i: "1"},
-        {x: 4, y: 0, w: 2, h: 2, i: "2"},
-        {x: 6, y: 0, w: 2, h: 2, i: "3"},
-        {x: 8, y: 0, w: 2, h: 2, i: "4"},
+        { x: 0, y: 0, w: 2, h: 2, i: '0' },
+        { x: 2, y: 0, w: 2, h: 2, i: '1' },
+        { x: 4, y: 0, w: 2, h: 2, i: '2' },
+        { x: 6, y: 0, w: 2, h: 2, i: '3' },
+        { x: 8, y: 0, w: 2, h: 2, i: '4' }
       ],
       draggable: true,
       resizable: true,
       colNum: 12,
-      index: 0,
+      index: 0
     }
   },
   mounted() {
     // this.$gridlayout.load();
-    this.index = this.layout.length;
+    this.index = this.layout.length
   },
   methods: {
     addItem: function () {
@@ -70,15 +73,15 @@ export default {
         y: this.layout.length + (this.colNum || 12), // puts it at the bottom
         w: 2,
         h: 2,
-        i: this.index,
-      });
+        i: this.index
+      })
       // Increment the counter to ensure key is always unique.
-      this.index++;
+      this.index++
     },
     removeItem: function (val) {
-      const index = this.layout.map(item => item.i).indexOf(val);
-      this.layout.splice(index, 1);
-    },
+      const index = this.layout.map((item) => item.i).indexOf(val)
+      this.layout.splice(index, 1)
+    }
   }
 }
 </script>
@@ -155,7 +158,8 @@ export default {
   height: 20px;
   top: 0;
   left: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
+    no-repeat;
   background-position: bottom right;
   padding: 0 8px 8px 0;
   background-repeat: no-repeat;
@@ -163,6 +167,4 @@ export default {
   box-sizing: border-box;
   cursor: pointer;
 }
-
-
 </style>

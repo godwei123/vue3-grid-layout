@@ -151,15 +151,35 @@
   resolved "https://registry.yarnpkg.com/@eslint-community/regexpp/-/regexpp-4.7.0.tgz#96e7c05e738327602ae5942437f9c6b177ec279a"
   integrity sha512-+HencqxU7CFJnQb7IKtuNBqS6Yx3Tz4kOL8BJXo+JyeiBm5MEX6pO8onXDkjrkCRlfYXS1Axro15ZjVFe9YgsA==
 
-"@interactjs/core@^1.10.18":
+"@interactjs/actions@^1.10.18":
+  version "1.10.18"
+  resolved "https://registry.yarnpkg.com/@interactjs/actions/-/actions-1.10.18.tgz#449d4f5fc2c05f11402b09356daa78b04f12f445"
+  integrity sha512-3hsDg87HNZUNE2G3heshSdyrUu4yd2I3b4hb5yz3pLIqvHoPyqZSreOs1l5Rb5NfecS1SNwR0Gygoyy/F3qGZA==
+  optionalDependencies:
+    "@interactjs/interact" "1.10.18"
+
+"@interactjs/core@1.10.18", "@interactjs/core@^1.10.18":
   version "1.10.18"
   resolved "https://registry.yarnpkg.com/@interactjs/core/-/core-1.10.18.tgz#02e3c8ac67455d33b06973a7423233ca4585e5d1"
   integrity sha512-shXHL+U5BMLtWMY84Bpo7OCMEueQdj0NgDGZDPzXMrmxriz1Ovn8fw2VmI18xFWryTbKJc2RwRDK/NJ6Vg+tNg==
+
+"@interactjs/interact@1.10.18":
+  version "1.10.18"
+  resolved "https://registry.yarnpkg.com/@interactjs/interact/-/interact-1.10.18.tgz#22aaff79604961b62c90b511eff1b14d308d92db"
+  integrity sha512-09H1uUK3Ly25+DZAuocYee5TET08LfwcvtFOkr+MvdWETjAED5ZVQwrD+LzyUpJ7pQ1WOFGk03nF/QmnPDO43w==
+  dependencies:
+    "@interactjs/core" "1.10.18"
+    "@interactjs/utils" "1.10.18"
 
 "@interactjs/types@1.10.18", "@interactjs/types@^1.10.18":
   version "1.10.18"
   resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.18.tgz#807411b3e460f856e26e7ba988dab6abb14da15f"
   integrity sha512-3a+2Kx6PhA60ekxImRQJl+EyT4lD0/kd3/PveyaLtgfNxkxnSWdUq7Ixo3Y/t1lon4EqVGZQgp+qj/QNaEs6qA==
+
+"@interactjs/utils@1.10.18":
+  version "1.10.18"
+  resolved "https://registry.yarnpkg.com/@interactjs/utils/-/utils-1.10.18.tgz#7da65d3b5c05d23f09c2aa23485002cdc58e821e"
+  integrity sha512-nt+uQat9pbjzNeP8I2X7rjBmmuoNwMCgXb+5Vl6zHHlOzM3Y6RATwsciR65E1X8Q/OrKtH2G49C1Zy1RoGw3UQ==
 
 "@jridgewell/sourcemap-codec@^1.4.15":
   version "1.4.15"

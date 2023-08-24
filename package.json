@@ -10,6 +10,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@interactjs/actions": "^1.10.18",
     "element-resize-detector": "^1.2.4",
     "interactjs": "^1.10.18",
     "mitt": "^3.0.1",

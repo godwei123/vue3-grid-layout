@@ -27,8 +27,8 @@ import {
 } from 'vue'
 import GridItem from './GridItem.vue'
 import elementResizeDetectorMaker, { Erd } from 'element-resize-detector'
-import { IGridItem, Layout, LayoutPropType, LayoutState, Point, ResponsiveLayout } from '../types'
-import emitter from '../utils/mitt.ts'
+import { IGridItem, Layout, LayoutPropType, LayoutState, Point, ResponsiveLayout } from './types'
+import emitter from './utils/mitt.ts'
 import {
   addWindowEventListener,
   bottom,
@@ -44,7 +44,8 @@ import {
   moveElement,
   removeWindowEventListener,
   validateLayout
-} from '../utils'
+} from './utils'
+import { useDebounce } from './utils/hooks.ts'
 
 const props = withDefaults(defineProps<LayoutPropType>(), {
   autoSize: true,
@@ -100,12 +101,12 @@ const state = reactive<LayoutState>({
 
 provide('layout', { ...props, ...state })
 
-const onWindowResize = () => {
+const onWindowResize = useDebounce(() => {
   if (layoutRef.value) {
     state.width = (layoutRef.value as HTMLElement).offsetWidth
   }
   emitter.emit('resizeEvent')
-}
+}, 100)
 
 const initResponsiveFeatures = () => {
   state.layouts = cloneDeep(props.responsiveLayouts)

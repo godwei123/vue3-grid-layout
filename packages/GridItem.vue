@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { ItemPropsType, ItemState, Position, PositionLeft, PositionRight } from '../types'
+import { ItemPropsType, ItemState, Position, PositionLeft, PositionRight } from './types'
 import {
   computed,
   CSSProperties,
@@ -19,11 +19,11 @@ import {
   watch
 } from 'vue'
 import interact from 'interactjs'
-import { DraggableOptions } from '@interactjs/actions/drag/plugin'
-import { Interactable } from '@interactjs/core/Interactable'
+// import '@interactjs/types'
+// import { DraggableOptions } from '@interactjs/actions/drag/plugin'
+// import { ResizableOptions } from '@interactjs/actions/resize/plugin'
 import Interact from '@interactjs/types/index'
-import { ResizableOptions } from '@interactjs/actions/resize/plugin'
-import emitter from '../utils/mitt.ts'
+import emitter from './utils/mitt.ts'
 import {
   calcGridItemWHPx,
   clamp,
@@ -35,7 +35,7 @@ import {
   setTopRight,
   setTransform,
   setTransformRtl
-} from '../utils'
+} from './utils'
 
 const props = withDefaults(defineProps<ItemPropsType>(), {
   static: false,
@@ -54,7 +54,7 @@ const props = withDefaults(defineProps<ItemPropsType>(), {
 })
 const emit = defineEmits(['move', 'resize', 'moved', 'resized', 'containerResized'])
 const itemRef = ref<HTMLElement | null>()
-let instance: Interactable
+let instance: any
 const layout = inject<any>('layout', {})
 
 const state = reactive<ItemState>({
@@ -456,7 +456,7 @@ const tryMakeDraggable = () => {
     }
   }
   if (state.draggable && !props.static) {
-    const opts: DraggableOptions = {
+    const opts = {
       ignoreFrom: props.dragIgnoreFrom,
       allowFrom: props.dragAllowFrom,
       ...props.dragOption
@@ -484,7 +484,7 @@ const tryMakeResizable = () => {
   if (state.resizable && !props.static) {
     let maximum = calcPosition(0, 0, props.maxW, props.maxH)
     let minimum = calcPosition(0, 0, props.minW, props.minH)
-    const opts: ResizableOptions = {
+    const opts: any = {
       edges: {
         left: false,
         right: `.${resizableHandleClass.value.trim().replace(' ', '.')}`,

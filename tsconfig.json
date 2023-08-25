@@ -25,9 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    // 自动生成声明文件
     "declarationDir": "dist"
-    // 声明文件输出的目录
   },
   "include": [
     "src/**/*.ts",

@@ -19,8 +19,6 @@ import {
   watch
 } from 'vue'
 import interact from 'interactjs'
-import Interact from '@interactjs/types/index'
-import emitter from './utils/mitt.ts'
 import {
   calcGridItemWHPx,
   clamp,
@@ -53,6 +51,7 @@ const emit = defineEmits(['move', 'resize', 'moved', 'resized', 'containerResize
 const itemRef = ref<HTMLElement | null>()
 let instance: any
 const layout = inject<any>('layout', {})
+const emitter = inject<any>('emitter', {})
 
 const state = reactive<ItemState>({
   cols: 1,

@@ -151,7 +151,7 @@
   resolved "https://registry.yarnpkg.com/@eslint-community/regexpp/-/regexpp-4.7.0.tgz#96e7c05e738327602ae5942437f9c6b177ec279a"
   integrity sha512-+HencqxU7CFJnQb7IKtuNBqS6Yx3Tz4kOL8BJXo+JyeiBm5MEX6pO8onXDkjrkCRlfYXS1Axro15ZjVFe9YgsA==
 
-"@interactjs/types@1.10.18":
+"@interactjs/types@1.10.18", "@interactjs/types@^1.10.18":
   version "1.10.18"
   resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.10.18.tgz#807411b3e460f856e26e7ba988dab6abb14da15f"
   integrity sha512-3a+2Kx6PhA60ekxImRQJl+EyT4lD0/kd3/PveyaLtgfNxkxnSWdUq7Ixo3Y/t1lon4EqVGZQgp+qj/QNaEs6qA==

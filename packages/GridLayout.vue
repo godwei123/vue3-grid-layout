@@ -27,8 +27,15 @@ import {
 } from 'vue'
 import GridItem from './GridItem.vue'
 import elementResizeDetectorMaker, { Erd } from 'element-resize-detector'
-import { IGridItem, Layout, LayoutPropType, LayoutState, Point, ResponsiveLayout } from './types'
-import emitter from './utils/mitt.ts'
+import {
+  Events,
+  IGridItem,
+  Layout,
+  LayoutPropType,
+  LayoutState,
+  Point,
+  ResponsiveLayout
+} from './types'
 import {
   addWindowEventListener,
   bottom,
@@ -46,6 +53,9 @@ import {
   validateLayout
 } from './utils'
 import { useDebounce } from './utils/hooks.ts'
+import mitt from 'mitt'
+
+const emitter = mitt<Events>()
 
 const props = withDefaults(defineProps<LayoutPropType>(), {
   autoSize: true,
@@ -100,6 +110,7 @@ const state = reactive<LayoutState>({
 })
 
 provide('layout', { ...props, ...state })
+provide('emitter', emitter)
 
 const onWindowResize = useDebounce(() => {
   if (layoutRef.value) {
@@ -165,7 +176,7 @@ const layoutUpdate = () => {
       state.lastLayoutLength = props.layout.length
       initResponsiveFeatures()
     }
-    compact(props.layout, props.verticalCompact, {})
+    compact(props.layout, props.verticalCompact)
     emitter.emit('updateWidth', state.width)
     updateHeight()
     emit('layout-updated', props.layout)
@@ -188,10 +199,7 @@ watch(
 )
 watch(
   () => props.layout,
-  () => layoutUpdate(),
-  {
-    deep: true
-  }
+  () => layoutUpdate()
 )
 watch(
   () => props.colNum,
@@ -289,7 +297,7 @@ const resizeEventHandler = (
 
   if (props.responsive) responsiveGridLayout()
 
-  compact(props.layout, props.verticalCompact, {})
+  compact(props.layout, props.verticalCompact)
   emitter.emit('compact')
   updateHeight()
 
@@ -300,7 +308,7 @@ const resizeEventHandler = (
 }
 
 const dragEventHandler = (
-  params: [string, string | number | symbol, number, number, number, number]
+  params?: [string, string | number | symbol, number, number, number, number]
 ) => {
   if (params === undefined) return
   const [eventName, id, x, y, h, w] = params
@@ -337,7 +345,7 @@ const dragEventHandler = (
     compact(newLayout, props.verticalCompact, positionsBeforeDrag)
     l.static = false
   } else {
-    compact(newLayout, props.verticalCompact, {})
+    compact(newLayout, props.verticalCompact)
   }
 
   // needed because vue can't detect changes on array element properties
@@ -367,7 +375,7 @@ onMounted(async () => {
   initResponsiveFeatures()
   onWindowResize()
   addWindowEventListener('resize', onWindowResize)
-  compact(props.layout, props.verticalCompact, {})
+  compact(props.layout, props.verticalCompact)
   emit('layout-updated', props.layout)
   emit('update:layout', props.layout)
   updateHeight()

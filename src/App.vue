@@ -39,6 +39,7 @@
       </div>
       <grid-layout
         id="grid-layout"
+        class="grid"
         :margin="[parseInt(state.marginX), parseInt(state.marginY)]"
         v-model:layout="state.layout"
         :col-num="parseInt(state.colNum)"
@@ -86,32 +87,6 @@
           <span :text="item.i" @removeItem="removeItem($event)">{{ item.i }}</span>
         </grid-item>
       </grid-layout>
-      <hr />
-      <grid-layout
-        v-model:layout="state.layout2"
-        :col-num="12"
-        :row-height="state.rowHeight"
-        :is-draggable="state.draggable"
-        :is-resizable="state.resizable"
-        :vertical-compact="true"
-        :use-css-transforms="true"
-      >
-        <grid-item
-          v-for="item in state.layout2"
-          :key="item.i"
-          :x="item.x"
-          :y="item.y"
-          :w="item.w"
-          :h="item.h"
-          :min-w="2"
-          :min-h="2"
-          :i="item.i"
-          :is-draggable="item.draggable"
-          :is-resizable="item.resizable"
-        >
-          <span>{{ item.i }}</span>
-        </grid-item>
-      </grid-layout>
     </div>
   </main>
 </template>
@@ -121,70 +96,48 @@ import { onMounted, reactive } from 'vue'
 import { getDocumentDir, setDocumentDir } from '../packages/utils'
 import { GridItem, GridLayout } from '../packages'
 
-// const testLayout = [
-//   {
-//     x: 0,
-//     y: 0,
-//     w: 2,
-//     h: 2,
-//     i: '0',
-//     resizable: true,
-//     draggable: true,
-//     static: false,
-//     minY: 0,
-//     maxY: 2
-//   },
-//   { x: 2, y: 0, w: 2, h: 4, i: '1', resizable: null, draggable: null, static: true },
-//   {
-//     x: 4,
-//     y: 0,
-//     w: 2,
-//     h: 5,
-//     i: '2',
-//     resizable: false,
-//     draggable: false,
-//     static: false,
-//     minX: 4,
-//     maxX: 4,
-//     minW: 2,
-//     maxW: 2,
-//     preserveAspectRatio: true
-//   },
-//   {
-//     x: 6,
-//     y: 0,
-//     w: 2,
-//     h: 3,
-//     i: '3',
-//     resizable: false,
-//     draggable: false,
-//     static: false,
-//     preserveAspectRatio: true
-//   },
-//   { x: 8, y: 0, w: 2, h: 3, i: '4', resizable: false, draggable: false, static: false },
-//   { x: 10, y: 0, w: 2, h: 3, i: '5', resizable: false, draggable: false, static: false },
-//   { x: 0, y: 5, w: 2, h: 5, i: '6', resizable: false, draggable: false, static: false },
-//   { x: 2, y: 5, w: 2, h: 5, i: '7', resizable: false, draggable: false, static: false },
-//   { x: 4, y: 5, w: 2, h: 5, i: '8', resizable: false, draggable: false, static: false },
-//   { x: 6, y: 3, w: 2, h: 4, i: '9', resizable: false, draggable: false, static: true },
-//   { x: 8, y: 4, w: 2, h: 4, i: '10', resizable: false, draggable: false, static: false },
-//   { x: 10, y: 4, w: 2, h: 4, i: '11', resizable: false, draggable: false, static: false, minY: 4 },
-//   { x: 0, y: 10, w: 2, h: 5, i: '12', resizable: false, draggable: false, static: false },
-//   { x: 2, y: 10, w: 2, h: 5, i: '13', resizable: false, draggable: false, static: false },
-//   { x: 4, y: 8, w: 2, h: 4, i: '14', resizable: false, draggable: false, static: false },
-//   { x: 6, y: 8, w: 2, h: 4, i: '15', resizable: false, draggable: false, static: false },
-//   { x: 8, y: 10, w: 2, h: 5, i: '16', resizable: false, draggable: false, static: false },
-//   { x: 10, y: 4, w: 2, h: 2, i: '17', resizable: false, draggable: false, static: false },
-//   { x: 0, y: 9, w: 2, h: 3, i: '18', resizable: false, draggable: false, static: false },
-//   { x: 2, y: 6, w: 2, h: 2, i: '19', resizable: false, draggable: false, static: false }
-// ]
-
-let testLayout = [
-  { x: 0, y: 0, w: 2, h: 2, i: '0' },
-  { x: 2, y: 0, w: 2, h: 2, i: '1' },
-  { x: 4, y: 0, w: 2, h: 2, i: '2' },
-  { x: 6, y: 0, w: 2, h: 2, i: '3' },
-  { x: 8, y: 0, w: 2, h: 2, i: '4' }
+const testLayout = [
+  {
+    x: 0,
+    y: 0,
+    w: 2,
+    h: 2,
+    i: '0',
+    resizable: true,
+    draggable: true,
+    static: false,
+    minY: 0,
+    maxY: 2
+  },
+  { x: 2, y: 0, w: 2, h: 4, i: '1', resizable: null, draggable: null, static: true },
+  {
+    x: 4,
+    y: 0,
+    w: 2,
+    h: 5,
+    i: '2',
+    resizable: false,
+    draggable: false,
+    static: false,
+    minX: 4,
+    maxX: 4,
+    minW: 2,
+    maxW: 2,
+    preserveAspectRatio: true
+  },
+  {
+    x: 6,
+    y: 0,
+    w: 2,
+    h: 3,
+    i: '3',
+    resizable: false,
+    draggable: false,
+    static: false,
+    preserveAspectRatio: true
+  },
+  { x: 8, y: 0, w: 2, h: 3, i: '4', resizable: false, draggable: false, static: false },
+  { x: 10, y: 4, w: 2, h: 4, i: '6', resizable: false, draggable: false, static: false, minY: 4 }
 ]
 
 const state = reactive({
@@ -193,7 +146,7 @@ const state = reactive({
   draggable: true,
   resizable: true,
   mirrored: false,
-  responsive: true,
+  responsive: false,
   bounded: false,
   transformScale: 1,
   preventCollision: false,
@@ -426,11 +379,9 @@ function breakpointChangedEvent(newBreakpoint, newLayout) {
   height: 20px;
   top: 0;
   left: 0;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
-    no-repeat;
-  background-position: bottom right;
   padding: 0 8px 8px 0;
-  background-repeat: no-repeat;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>")
+    no-repeat bottom right;
   background-origin: content-box;
   box-sizing: border-box;
   cursor: pointer;
@@ -438,5 +389,19 @@ function breakpointChangedEvent(newBreakpoint, newLayout) {
 
 #content .vue3-grid-item.vue3-grid-placeholder {
   background-color: green;
+}
+
+.grid::before {
+  content: '';
+  background-size: calc(calc(100% - 5px) / 12) 40px;
+  background-image: linear-gradient(to right, lightgrey 1px, transparent 1px),
+    linear-gradient(to bottom, lightgrey 1px, transparent 1px);
+  height: calc(100% - 5px);
+  width: calc(100% - 5px);
+  /*height: 100%;*/
+  /*width: 100%;*/
+  position: absolute;
+  background-repeat: repeat;
+  margin: 5px;
 }
 </style>

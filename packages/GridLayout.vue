@@ -188,7 +188,10 @@ watch(
 )
 watch(
   () => props.layout,
-  () => layoutUpdate()
+  () => layoutUpdate(),
+  {
+    deep: true
+  }
 )
 watch(
   () => props.colNum,

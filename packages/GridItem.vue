@@ -1,5 +1,5 @@
 <template>
-  <div ref="itemRef" class="vue3-grid-item" :class="classObj" :style="state.style" :id="String(i)">
+  <div ref="itemRef" class="vue3-grid-item" :class="classObj" :style="state.style" :key="i">
     <slot></slot>
     <span v-if="resizableAndNotStatic" :class="resizableHandleClass"></span>
   </div>
@@ -19,9 +19,6 @@ import {
   watch
 } from 'vue'
 import interact from 'interactjs'
-// import '@interactjs/types'
-// import { DraggableOptions } from '@interactjs/actions/drag/plugin'
-// import { ResizableOptions } from '@interactjs/actions/resize/plugin'
 import Interact from '@interactjs/types/index'
 import emitter from './utils/mitt.ts'
 import {
@@ -353,7 +350,6 @@ const handleDrag = (event: Interact.DragEvent) => {
   if (state.isResizing) return
 
   const position = getControlPosition(event)
-  if (position === null) return
   const { x, y } = position
 
   let newPosition = { top: 0, left: 0 }
@@ -451,9 +447,7 @@ const handleDrag = (event: Interact.DragEvent) => {
 const tryMakeDraggable = () => {
   if (!instance) {
     instance = interact(<HTMLElement>itemRef.value)
-    if (!state.useStyleCursor) {
-      instance.styleCursor(false)
-    }
+    if (!state.useStyleCursor) instance.styleCursor(false)
   }
   if (state.draggable && !props.static) {
     const opts = {

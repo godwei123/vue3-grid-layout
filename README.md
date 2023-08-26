@@ -1,9 +1,13 @@
-# Vue 3 + TypeScript + Vite
+# Vue 3 + TypeScript + Vite + vue-grid-layout
+
+- 个人学习内容
 
 bug
 
-- 计算重叠问题
-- 拖放重叠问题
+- resize 重叠问题
+- drag 重叠问题
+- 多组件
 - CI/CD问题
-- eslint配置
+- minY, maxY, minX, maxX
+- addItem
 

@@ -194,7 +194,7 @@ export function getStatics(layout: Layout) {
 }
 
 export function sortLayoutItemsByRowCol(layout: Layout) {
-  return new Array<IGridItem>().concat(layout).sort(function (a, b) {
+  return layout.sort(function (a, b) {
     if (a.y === b.y && a.x === b.x) {
       return 0
     }
@@ -227,7 +227,7 @@ export function compactItem(
   compareWith: Layout,
   l: IGridItem,
   verticalCompact: boolean,
-  minPositions: any
+  minPositions?: any
 ): IGridItem {
   if (verticalCompact) {
     while (l.y > 0 && !getFirstCollision(compareWith, l)) {
@@ -345,7 +345,6 @@ export function moveElement(
       layout = moveElementAwayFromCollision(layout, l, collision, isUserAction)
     }
   }
-
   return layout
 }
 

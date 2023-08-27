@@ -88,7 +88,7 @@ export interface LayoutPropType {
   isMirrored?: boolean
   isBounded?: boolean
   autoSize?: boolean
-  restoreOnDrag?: boolean
+  // restoreOnDrag?: boolean
   verticalCompact?: boolean
   preventCollision?: boolean
   useCssTransforms?: boolean

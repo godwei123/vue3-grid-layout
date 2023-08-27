@@ -112,7 +112,7 @@ const updateWidthHandler = (width: number) => {
 }
 
 const compactHandler = () => {
-  compact()
+  createStyle()
 }
 
 const setDraggableHandler = (isDraggable: boolean | null) => {
@@ -143,7 +143,7 @@ const setMaxRowsHandler = (value: number) => {
 
 const directionChangeHandler = () => {
   state.rtl = getDocumentDir() === 'rtl'
-  compact()
+  createStyle()
 }
 
 const setColNumHandler = (colNum: string | number) => {
@@ -271,10 +271,6 @@ const emitContainerResized = () => {
   emit('containerResized', props.i, props.h, props.w, styleProps.height, styleProps.width)
 }
 
-const compact = () => {
-  createStyle()
-}
-
 //---------------------------------
 
 const updateWidth = (width: number, colNum?: number) => {
@@ -400,7 +396,7 @@ const handleDrag = (event: Interact.DragEvent) => {
     }
     case 'dragmove': {
       const coreEvent = createCoreData(state.lastX, state.lastY, x, y)
-      if (unref(renderRtl)) {
+      if (renderRtl.value) {
         newPosition.left = state.dragging?.left - coreEvent.deltaX / state.transformScale
       } else {
         newPosition.left = state.dragging?.left + coreEvent.deltaX / state.transformScale

@@ -15,28 +15,6 @@
       </div>
     </div>
     <div id="content">
-      <button @click="decreaseWidth">Decrease Width</button>
-      <button @click="increaseWidth">Increase Width</button>
-      <button @click="scaleHalf">Scale x0.5</button>
-      <button @click="scaleThreeQuarters">Scale x0.75</button>
-      <button @click="scaleIdentity">Scale x1.0</button>
-      <button @click="addItem">Add an item</button>
-      <button @click="addItemDynamically">Add an item dynamically</button>
-      <!-- Add to show rtl support -->
-      <button @click="changeDirection">Change Direction</button>
-      <input type="checkbox" v-model="state.draggable" /> Draggable
-      <input type="checkbox" v-model="state.resizable" /> Resizable
-      <input type="checkbox" v-model="state.mirrored" /> Mirrored
-      <input type="checkbox" v-model="state.bounded" /> Bounded
-      <input type="checkbox" v-model="state.responsive" /> Responsive
-      <input type="checkbox" v-model="state.preventCollision" /> Prevent Collision
-      <input type="checkbox" v-model="state.compact" /> Vertical Compact
-      <div style="margin-top: 10px; margin-bottom: 10px">
-        Row Height: <input type="number" v-model="state.rowHeight" /> Col nums:
-        <input type="number" v-model="state.colNum" /> Margin x:
-        <input type="number" v-model="state.marginX" /> Margin y:
-        <input type="number" v-model="state.marginY" />
-      </div>
       <grid-layout
         id="grid-layout"
         class="grid"
@@ -50,16 +28,10 @@
         :is-bounded="state.bounded"
         :prevent-collision="state.preventCollision"
         :vertical-compact="state.compact"
-        :restore-on-drag="state.restoreOnDrag"
         :use-css-transforms="true"
         :responsive="state.responsive"
         :transformScale="state.transformScale"
-        @layout-created="layoutCreatedEvent"
-        @layout-before-mount="layoutBeforeMountEvent"
-        @layout-mounted="layoutMountedEvent"
-        @layout-ready="layoutReadyEvent"
         @layout-updated="layoutUpdatedEvent"
-        @breakpoint-changed="breakpointChangedEvent"
       >
         <grid-item
           v-for="item in state.layout"
@@ -77,14 +49,9 @@
           :min-y="item.minY"
           :max-y="item.maxY"
           :preserve-aspect-ratio="item.preserveAspectRatio"
-          @resize="resize"
-          @move="move"
-          @resized="resized"
-          @container-resized="containerResized"
           @moved="moved"
         >
-          <!--<custom-drag-element :text="item.i"></custom-drag-element>-->
-          <span :text="item.i" @removeItem="removeItem($event)">{{ item.i }}</span>
+          <span>{{ item.i }}</span>
         </grid-item>
       </grid-layout>
     </div>
@@ -93,51 +60,11 @@
 
 <script setup>
 import { onMounted, reactive } from 'vue'
-import { getDocumentDir, setDocumentDir } from '../packages/utils'
 import { GridItem, GridLayout } from '../packages'
 
 const testLayout = [
-  {
-    x: 0,
-    y: 0,
-    w: 2,
-    h: 2,
-    i: '0',
-    resizable: true,
-    draggable: true,
-    static: false,
-    minY: 0,
-    maxY: 2
-  },
-  { x: 2, y: 0, w: 2, h: 4, i: '1', resizable: null, draggable: null, static: true },
-  {
-    x: 4,
-    y: 0,
-    w: 2,
-    h: 5,
-    i: '2',
-    resizable: false,
-    draggable: false,
-    static: false,
-    minX: 4,
-    maxX: 4,
-    minW: 2,
-    maxW: 2,
-    preserveAspectRatio: true
-  },
-  {
-    x: 6,
-    y: 0,
-    w: 2,
-    h: 3,
-    i: '3',
-    resizable: false,
-    draggable: false,
-    static: false,
-    preserveAspectRatio: true
-  },
-  { x: 8, y: 0, w: 2, h: 3, i: '4', resizable: false, draggable: false, static: false },
-  { x: 10, y: 4, w: 2, h: 4, i: '6', resizable: false, draggable: false, static: false, minY: 4 }
+  { x: 0, y: 0, w: 2, h: 4, i: '1', static: true },
+  { x: 2, y: 0, w: 2, h: 5, i: '2' }
 ]
 
 const state = reactive({
@@ -151,7 +78,6 @@ const state = reactive({
   transformScale: 1,
   preventCollision: false,
   compact: true,
-  restoreOnDrag: true,
   rowHeight: 30,
   colNum: 12,
   index: 0,
@@ -163,125 +89,12 @@ onMounted(() => {
   state.index = state.layout.length
 })
 
-// function clicked()  {
-//   window.alert("CLICK!");
-// }
-
-function increaseWidth() {
-  let width = document.getElementById('content').offsetWidth
-  width += 20
-  document.getElementById('content').style.width = `${width}px`
-}
-
-function decreaseWidth() {
-  let width = document.getElementById('content').offsetWidth
-  width -= 20
-  document.getElementById('content').style.width = `${width}px`
-}
-
-function scaleHalf() {
-  state.transformScale = 0.5
-  document.getElementById('grid-layout').style.transform = 'scale(0.5)'
-}
-
-function scaleThreeQuarters() {
-  state.transformScale = 0.75
-  document.getElementById('grid-layout').style.transform = 'scale(0.75)'
-}
-
-function scaleIdentity() {
-  state.transformScale = 1
-  document.getElementById('grid-layout').style.transform = 'scale(1)'
-}
-
-function removeItem(i) {
-  console.log(`### REMOVE ${i}`)
-  const index = state.layout.map((item) => item.i).indexOf(i)
-  state.layout.splice(index, 1)
-}
-
-function addItem() {
-  // let self = state;
-  // console.log("### LENGTH: " + state.layout.length);
-  const item = { x: 0, y: 0, w: 2, h: 2, i: `${state.index}`, whatever: 'bbb' }
-  state.index++
-  state.layout.push(item)
-}
-
-function addItemDynamically() {
-  const x = (state.layout.length * 2) % (state.colNum || 12)
-  const y = state.layout.length + (state.colNum || 12)
-  console.log(`X=${x} Y=${y}`)
-  const item = {
-    x,
-    y,
-    w: 2,
-    h: 2,
-    i: `${state.index}`
-  }
-  state.index++
-  state.layout.push(item)
-}
-
-function move(i, newX, newY) {
-  console.log(`MOVE i=${i}, X=${newX}, Y=${newY}`)
-}
-
-function resize(i, newH, newW, newHPx, newWPx) {
-  console.log(`RESIZE i=${i}, H=${newH}, W=${newW}, H(px)=${newHPx}, W(px)=${newWPx}`)
-}
-
 function moved(i, newX, newY) {
   console.log(`### MOVED i=${i}, X=${newX}, Y=${newY}`)
 }
 
-function resized(i, newH, newW, newHPx, newWPx) {
-  console.log(`### RESIZED i=${i}, H=${newH}, W=${newW}, H(px)=${newHPx}, W(px)=${newWPx}`)
-}
-
-function containerResized(i, newH, newW, newHPx, newWPx) {
-  console.log(
-    `### CONTAINER RESIZED i=${i}, H=${newH}, W=${newW}, H(px)=${newHPx}, W(px)=${newWPx}`
-  )
-}
-
-/**
- * Add change direction button
- */
-function changeDirection() {
-  const documentDirection = getDocumentDir()
-  let toggle = ''
-  if (documentDirection === 'rtl') {
-    toggle = 'ltr'
-  } else {
-    toggle = 'rtl'
-  }
-  setDocumentDir(toggle)
-  // eventBus.$emit('directionchange');
-}
-
-function layoutCreatedEvent(newLayout) {
-  console.log('Created layout: ', newLayout)
-}
-
-function layoutBeforeMountEvent(newLayout) {
-  console.log('beforeMount layout: ', newLayout)
-}
-
-function layoutMountedEvent(newLayout) {
-  console.log('Mounted layout: ', newLayout)
-}
-
-function layoutReadyEvent(newLayout) {
-  console.log('Ready layout: ', newLayout)
-}
-
 function layoutUpdatedEvent(newLayout) {
   console.log('Updated layout: ', newLayout)
-}
-
-function breakpointChangedEvent(newBreakpoint, newLayout) {
-  console.log('breakpoint changed breakpoint=', newBreakpoint, ', layout: ', newLayout)
 }
 </script>
 

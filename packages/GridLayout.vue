@@ -68,7 +68,7 @@ const props = withDefaults(defineProps<LayoutPropType>(), {
   isBounded: false,
   verticalCompact: true,
   useCssTransforms: true,
-  restoreOnDrag: false,
+  // restoreOnDrag: false,
   responsive: false,
   responsiveLayouts: () => ({}),
   transformScale: 1,
@@ -340,15 +340,16 @@ const dragEventHandler = (
   }
   const newLayout = moveElement(props.layout, l, true, x, y, props.preventCollision)
   emit('update:layout', newLayout)
-  if (props.restoreOnDrag) {
-    l.static = true
-    compact(newLayout, props.verticalCompact, positionsBeforeDrag)
-    l.static = false
-  } else {
-    compact(newLayout, props.verticalCompact)
-  }
+  // todo bug delete restoreOnDrag
+  // if (props.restoreOnDrag) {
+  //   l.static = true
+  //   compact(newLayout, props.verticalCompact, positionsBeforeDrag)
+  //   l.static = false
+  // } else {
+  // compact(newLayout, props.verticalCompact)
+  // }
+  compact(newLayout, props.verticalCompact)
 
-  // needed because vue can't detect changes on array element properties
   emitter.emit('compact')
   updateHeight()
   if (eventName === 'dragend') {

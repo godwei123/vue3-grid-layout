@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive } from 'vue'
-import {GridLayout,GridItem} from '@godwei/vue3-grid-layout'
+import { GridItem, GridLayout } from '@godwei/vue3-grid-layout'
 // import { getDocumentDir, setDocumentDir } from '../utils'
 
 const testLayout = [
@@ -71,7 +71,6 @@ const state = reactive({
   transformScale: 1,
   preventCollision: false,
   compact: true,
-  restoreOnDrag: true,
   rowHeight: 30,
   colNum: 12,
   index: 0,
@@ -249,7 +248,6 @@ function breakpointChangedEvent(newBreakpoint, newLayout) {
         :is-bounded="state.bounded"
         :prevent-collision="state.preventCollision"
         :vertical-compact="state.compact"
-        :restore-on-drag="state.restoreOnDrag"
         :use-css-transforms="true"
         :responsive="state.responsive"
         :transformScale="state.transformScale"

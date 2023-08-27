@@ -63,8 +63,8 @@ import { onMounted, reactive } from 'vue'
 import { GridItem, GridLayout } from '../packages'
 
 const testLayout = [
-  { x: 0, y: 0, w: 2, h: 4, i: '1', static: true },
-  { x: 2, y: 0, w: 2, h: 5, i: '2' }
+  { x: 0, y: 0, w: 2, h: 4, i: '1' },
+  { x: 3, y: 0, w: 2, h: 5, i: '2', static: true }
 ]
 
 const state = reactive({

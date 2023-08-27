@@ -27,15 +27,7 @@ import {
 } from 'vue'
 import GridItem from './GridItem.vue'
 import elementResizeDetectorMaker, { Erd } from 'element-resize-detector'
-import {
-  Events,
-  IGridItem,
-  Layout,
-  LayoutPropType,
-  LayoutState,
-  Point,
-  ResponsiveLayout
-} from './types'
+import { Events, IGridItem, Layout, LayoutPropType, LayoutState, ResponsiveLayout } from './types'
 import {
   addWindowEventListener,
   bottom,
@@ -89,7 +81,7 @@ const emit = defineEmits<{
 }>()
 
 let erd: Erd
-let positionsBeforeDrag: { [key: number]: Point }
+// let positionsBeforeDrag: { [key: number]: Point }
 let layoutRef = ref<HTMLElement | null>(null)
 
 const state = reactive<LayoutState>({
@@ -313,15 +305,15 @@ const dragEventHandler = (
   if (params === undefined) return
   const [eventName, id, x, y, h, w] = params
   let l = getLayoutItem(props.layout, id) || ({ x: 0, y: 0 } as IGridItem)
-  if (eventName === 'dragstart' && !props.verticalCompact) {
-    positionsBeforeDrag = props.layout.reduce(
-      (result, { i, x, y }) => ({
-        ...result,
-        [i]: { x, y }
-      }),
-      {}
-    )
-  }
+  // if (eventName === 'dragstart' && !props.verticalCompact) {
+  // positionsBeforeDrag = props.layout.reduce(
+  //   (result, { i, x, y }) => ({
+  //     ...result,
+  //     [i]: { x, y }
+  //   }),
+  //   {}
+  // )
+  // }
 
   if (eventName === 'dragmove' || eventName === 'dragstart') {
     state.placeholder.i = id
@@ -353,7 +345,7 @@ const dragEventHandler = (
   emitter.emit('compact')
   updateHeight()
   if (eventName === 'dragend') {
-    positionsBeforeDrag = {}
+    // positionsBeforeDrag = {}
     emit('layout-updated', newLayout)
     emit('update:layout', newLayout)
   }
